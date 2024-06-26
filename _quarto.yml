@@ -6,9 +6,6 @@ website:
   title: "mysite"
   navbar:
     left:
-      - href: index.qmd
-        text: Home
-      - about.qmd
       - posts.qmd
 
 format:
