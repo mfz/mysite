@@ -1,0 +1,135 @@
+---
+title: "Tensor notation"
+description: "Introduction to tensor, index, or Einstein notation"
+image: Einstein.jpeg
+draft: false
+---
+
+![](Einstein.jpeg){width=600}
+
+### Vectors
+
+In tensor notation, a **vector** is written as
+
+$$
+\mathbf{u} = u_i
+$$
+
+where $i = 1,2,3$, corresponding to the $x$, $y$, and $z$ component, respectively.
+
+
+$$
+\mathbf{u} + \mathbf{v} = u_i + v_i
+$$
+
+### Einstein summation
+
+Any index appearing twice is automatically summed from 1 to 3.
+This is called Einstein summation. Any index can at most appear twice. 
+
+### Dot (inner) product
+
+Using Einstein summation, the dot (inner) product of two vectors is
+
+$$
+\mathbf{u} \cdot \mathbf{v} = u_i v_i = u_1 v_1 + u_2 v_2 + u_3 v_3
+$$
+
+### Dyadic (outer) product
+
+The dyadic (outer) product of two vectors is
+
+$$
+\mathbf{u} \otimes \mathbf{v} = u_i v_j = 
+\left[
+\begin{matrix} 
+u_1 v_1 & u_1 v_2 & u_1 v_3 \cr
+u_2 v_1 & u_2 v_2 & u_2 v_3 \cr
+u_3 v_1 & u_3 v_2 & u_3 v_3 
+\end{matrix}
+\right]
+$$
+
+### Differentiation with respect to time
+
+Differentiation with respect to time can be written as 
+
+$$
+\frac{\text{d}\mathbf{x}}{\text{d}t} = \mathbf{\dot{x}} = \dot{x_i} = x_{i|t}
+$$
+
+
+### Differentiation with respect to space
+
+The gradient of a scalar function is given by
+
+$$
+\nabla \phi = \partial_i \phi = \phi_{|i}
+$$
+
+The component-wise spatial derivative of a vector
+
+$$
+\frac{\partial \mathbf{u}}{\partial x_j} = u_{i|j}
+$$
+
+The divergence of a vector is
+
+$$
+\text{div} \ \mathbf{u} = \nabla \cdot \mathbf{u} = u_{i|i}
+$$
+
+### Kronecker delta
+
+The Kronecker delta is defined as
+
+$$
+\delta_{ij} = \begin{cases}
+\begin{matrix}
+1 & i = j \cr
+0 & \text{otherwise}
+\end{matrix}
+\end{cases}
+$$
+
+Kronecker delta is also often called the substitution operator, as
+
+$$
+u_i \delta_{ij} = u_j
+$$
+
+The Kronecker delta often occurs when one deals with spatial derivatives of position
+
+$$
+\frac{\partial x_i}{\partial x_j} = \partial_j x_i = x_{i|j} = \delta_{ij}
+$$
+
+
+### Levi-Civita alternating tensor
+
+$$
+\epsilon_{ijk} = \begin{cases}
+\begin{matrix}
+1 & ijk \in \{123, 231, 312\} \cr
+-1 & ijk \in \{132, 213, 321\} \cr
+0 & \text{otherwise}
+\end{matrix}
+\end{cases}
+$$
+
+
+Sometimes the following equality can be useful to simplify expressions:
+
+$$
+\epsilon_{ijk} \epsilon_{imn} = \delta_{jm}\delta_{kn}-\delta_{jn}\delta_{km}
+$$
+
+### Rotation or curl of a vector
+
+$$
+\text{rot} \ \mathbf{u} = \nabla \times \mathbf{u} = \epsilon_{ijk} u_{k|j}
+$$
+
+
+
+References: [https://www.continuummechanics.org]

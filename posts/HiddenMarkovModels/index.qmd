@@ -1,0 +1,174 @@
+---
+title: "Training Hidden Markov Models"
+description: "How to train an HMM using Expectation-Maximization (EM) and Gibbs sampling"
+draft: true
+---
+created using ChatGPT
+
+# EM Algorithm for Hidden Markov Models
+
+## Theory
+
+The EM (Expectation-Maximization) algorithm is used to find the maximum likelihood estimates of parameters in probabilistic models, especially when the data is incomplete or has hidden variables. For Hidden Markov Models (HMMs), it iteratively performs two steps: the E-step and the M-step, to converge to a local maximum of the likelihood function.
+
+### Definitions
+
+- **Observation Sequence $O = (O_1, O_2, \ldots, O_T)$**: The sequence of observed symbols.
+- **State Sequence $S = (S_1, S_2, \ldots, S_T)$**: The sequence of hidden states.
+- **Initial State Distribution $\pi$**: The probability distribution over the initial states.
+- **Transition Probabilities $A$**: The matrix of state transition probabilities, where $A_{ij} = P(S_t = j \mid S_{t-1} = i)$.
+- **Emission Probabilities $B$**: The matrix of observation probabilities, where $B_i(k) = P(O_t = k \mid S_t = i)$.
+
+### E-Step (Expectation Step)
+
+In the E-step, we compute the expected values of the hidden variables given the current estimates of the parameters.
+
+1. **Forward Probability**: $\alpha_t(i) = P(O_1, O_2, \ldots, O_t, S_t = i \mid \lambda)$
+   $$
+   \alpha_t(i) = \sum_{j=1}^N \alpha_{t-1}(j) A_{ji} B_i(O_t)
+   $$
+
+2. **Backward Probability**: $\beta_t(i) = P(O_{t+1}, O_{t+2}, \ldots, O_T \mid S_t = i, \lambda)$
+   $$
+   \beta_t(i) = \sum_{j=1}^N A_{ij} B_j(O_{t+1}) \beta_{t+1}(j)
+   $$
+
+3. **State Probability**: $\gamma_t(i) = P(S_t = i \mid O, \lambda)$
+   $$
+   \gamma_t(i) = \frac{\alpha_t(i) \beta_t(i)}{\sum_{j=1}^N \alpha_t(j) \beta_t(j)}
+   $$
+
+4. **Transition Probability**: $\xi_t(i, j) = P(S_t = i, S_{t+1} = j \mid O, \lambda)$
+   $$
+   \xi_t(i, j) = \frac{\alpha_t(i) A_{ij} B_j(O_{t+1}) \beta_{t+1}(j)}{\sum_{i=1}^N \sum_{j=1}^N \alpha_t(i) A_{ij} B_j(O_{t+1}) \beta_{t+1}(j)}
+   $$
+
+### M-Step (Maximization Step)
+
+In the M-step, we re-estimate the model parameters using the expected values computed in the E-step.
+
+1. **Update Initial State Distribution**:
+   $$
+   \pi_i = \gamma_1(i)
+   $$
+
+2. **Update Transition Probabilities**:
+   $$
+   A_{ij} = \frac{\sum_{t=1}^{T-1} \xi_t(i, j)}{\sum_{t=1}^{T-1} \gamma_t(i)}
+   $$
+
+3. **Update Emission Probabilities**:
+   $$
+   B_i(k) = \frac{\sum_{t=1}^T \gamma_t(i) \cdot 1(O_t = k)}{\sum_{t=1}^T \gamma_t(i)}
+   $$
+
+### Convergence
+
+- Iterate the E-step and M-step until the change in the log-likelihood is below a threshold.
+
+## Toy Example in Julia
+
+Here’s a simple implementation of the EM algorithm for HMMs in Julia using a toy example:
+
+```{julia}
+using Random
+using LinearAlgebra
+
+# Define initial parameters
+N = 2 # number of states
+M = 3 # number of observation symbols
+
+function normalize_vector(v)
+    return v ./ sum(v)
+end
+
+function normalize_matrix(mat; dims = 2)
+    return mat ./ sum(mat, dims=dims)
+end
+
+# Randomly initialize π, A, B
+π = normalize_vector(rand(N))
+A = normalize_matrix(rand(N, N))
+B = normalize_matrix(rand(N, M))
+
+# Observations (Toy example)
+O = [1, 2, 1, 0, 1] # Observation sequence
+T = length(O)
+
+# Function to run the forward algorithm
+function forward_algorithm(O, π, A, B)
+    N = length(π)
+    T = length(O)
+    α = zeros(N, T)
+    α[:, 1] = π .* B[:, O[1] + 1]
+    for t in 2:T
+        for j in 1:N
+            α[j, t] = sum(α[:, t-1] .* A[:, j]) * B[j, O[t] + 1]
+        end
+    end
+    return α
+end
+
+# Function to run the backward algorithm
+function backward_algorithm(O, A, B)
+    N = size(A, 1)
+    T = length(O)
+    β = ones(N, T)
+    for t in (T-1):-1:1
+        for i in 1:N
+            β[i, t] = sum(A[i, :] .* B[:, O[t+1] + 1] .* β[:, t+1])
+        end
+    end
+    return β
+end
+
+# Function to run the EM algorithm
+function em_algorithm(O, π, A, B, iterations)
+    N = length(π)
+    T = length(O)
+    for iter in 1:iterations
+        # E-Step
+        α = forward_algorithm(O, π, A, B)
+        β = backward_algorithm(O, A, B)
+        γ = normalize_matrix(α .* β; dims = 1)
+        ξ = zeros(N, N, T-1)
+        for t in 1:(T-1)
+            for i in 1:N
+                for j in 1:N
+                    ξ[i, j, t] = α[i, t] * A[i, j] * B[j, O[t+1] + 1] * β[j, t+1]
+                end
+            end
+            ξ[:, :, t] = normalize_matrix(ξ[:, :, t]; dims = 2)
+        end
+
+        # M-Step
+        π = γ[:, 1]
+        for i in 1:N
+            for j in 1:N
+                A[i, j] = sum(ξ[i, j, :]) / sum(γ[i, 1:T-1])
+            end
+        end
+        for i in 1:N
+            for k in 1:M
+                B[i, k] = sum(γ[i, O .== (k-1)]) / sum(γ[i, :])
+            end
+        end
+    end
+    return π, A, B
+end
+
+# Run EM algorithm
+iterations = 10
+π, A, B = em_algorithm(O, π, A, B, iterations)
+
+# Print the learned parameters
+println("Learned initial state distribution π:")
+println(π)
+println("Learned transition matrix A:")
+println(A)
+println("Learned emission matrix B:")
+println(B)
+```
+
+
+The code does not work correctly! The transition matrix is not properly normalized!
