@@ -2,7 +2,6 @@
   {
     "listing": "/posts.html",
     "items": [
-      "/posts/TuringIntro/index.html",
       "/posts/TensorNotation/index.html",
       "/posts/BayesianLCA/index.html"
     ]

@@ -6,6 +6,7 @@ format:
     toc: true
     number-sections: true
 jupyter: julia-1.10
+draft: true
 ---
 
 Turing.jl is a probabilistic proramming language that let's us define a generative model and does inference.
