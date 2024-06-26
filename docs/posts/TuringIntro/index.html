@@ -1,0 +1,1903 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.551">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="A quick introduction to probabilistic programming language Turing.jl">
+
+<title>mysite - Introduction to Turing.jl</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">mysite</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts.html"> 
+<span class="menu-text">My Notes</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Introduction to Turing.jl</h1>
+                  <div>
+        <div class="description">
+          A quick introduction to probabilistic programming language Turing.jl
+        </div>
+      </div>
+                </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#coin-example" id="toc-coin-example" class="nav-link active" data-scroll-target="#coin-example"><span class="header-section-number">1</span> Coin example</a>
+  <ul class="collapse">
+  <li><a href="#sample-from-prior" id="toc-sample-from-prior" class="nav-link" data-scroll-target="#sample-from-prior"><span class="header-section-number">1.1</span> Sample from prior</a></li>
+  <li><a href="#sample-from-posterior" id="toc-sample-from-posterior" class="nav-link" data-scroll-target="#sample-from-posterior"><span class="header-section-number">1.2</span> Sample from posterior</a></li>
+  <li><a href="#prior-predictive-check" id="toc-prior-predictive-check" class="nav-link" data-scroll-target="#prior-predictive-check"><span class="header-section-number">1.3</span> Prior predictive check</a></li>
+  <li><a href="#posterior-predictive-check" id="toc-posterior-predictive-check" class="nav-link" data-scroll-target="#posterior-predictive-check"><span class="header-section-number">1.4</span> Posterior predictive check</a></li>
+  <li><a href="#chains" id="toc-chains" class="nav-link" data-scroll-target="#chains"><span class="header-section-number">1.5</span> Chains</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>Turing.jl is a probabilistic proramming language that let’s us define a generative model and does inference.</p>
+<section id="coin-example" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="coin-example"><span class="header-section-number">1</span> Coin example</h2>
+<p>Let’s flip a biased coin a hundred times.</p>
+<div id="349a8f82" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Turing</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>coin_flips <span class="op">=</span> <span class="fu">rand</span>(<span class="fu">Bernoulli</span>(<span class="fl">0.7</span>), <span class="fl">100</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In order to do inference, we need to specify a model.</p>
+<p><span class="math display">\[ p \sim Beta(1,1) \]</span></p>
+<p><span class="math display">\[ coin flip \sim Bernoulli(p) \]</span></p>
+<div id="3b8c8fb7" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@model</span> <span class="kw">function</span> <span class="fu">coin</span>(data)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  p <span class="op">~</span>&nbsp;<span class="fu">Beta</span>(<span class="fl">1</span>,<span class="fl">1</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> i <span class="kw">in</span> <span class="fu">eachindex</span>(data) </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    data[i] <span class="op">~</span>&nbsp;<span class="fu">Bernoulli</span>(p)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>coin (generic function with 2 methods)</code></pre>
+</div>
+</div>
+<section id="sample-from-prior" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="sample-from-prior"><span class="header-section-number">1.1</span> Sample from prior</h3>
+<div id="c39c16e9" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>prior <span class="op">=</span> <span class="fu">sample</span>(<span class="fu">coin</span>(coin_flips), <span class="fu">Prior</span>(), <span class="fl">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling:  40%|████████████████▋                        |  ETA: 0:00:00Sampling: 100%|█████████████████████████████████████████| Time: 0:00:00</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div class="ansi-escaped-output">
+<pre>Chains MCMC chain (1000×2×1 Array{Float64, 3}):
+Iterations        = 1:1:1000
+Number of chains  = 1
+Samples per chain = 1000
+Wall duration     = 1.16 seconds
+Compute duration  = 1.16 seconds
+parameters        = p
+internals         = lp
+Summary Statistics
+ <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold"> ess_bulk </span> <span class="ansi-bold"> ess_tail </span> <span class="ansi-bold">    rhat </span> <span class="ansi-bold"> e</span> ⋯
+ <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  </span> ⋯
+           p    0.5016    0.2885    0.0093   964.7822   940.1033    1.0021     ⋯
+<span class="ansi-cyan-fg">                                                                1 column omitted</span>
+Quantiles
+ <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    2.5% </span> <span class="ansi-bold">   25.0% </span> <span class="ansi-bold">   50.0% </span> <span class="ansi-bold">   75.0% </span> <span class="ansi-bold">   97.5% </span>
+ <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span>
+           p    0.0376    0.2501    0.4939    0.7540    0.9760
+</pre>
+</div>
+</div>
+</div>
+<div id="ffdbe69b" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarystats</span>(prior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div class="ansi-escaped-output">
+<pre>Summary Statistics
+ <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold"> ess_bulk </span> <span class="ansi-bold"> ess_tail </span> <span class="ansi-bold">    rhat </span> <span class="ansi-bold"> e</span> ⋯
+ <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  </span> ⋯
+           p    0.5016    0.2885    0.0093   964.7822   940.1033    1.0021     ⋯
+<span class="ansi-cyan-fg">                                                                1 column omitted</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="e2e7d7e7" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(prior) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div>
+<div><div style="float: left;"><span>1000×4 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">975 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">iteration</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">chain</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">p</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">lp</th>
+</tr>
+<tr class="odd subheader headerLastRow">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.0461556</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.594452</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.159078</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.536642</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.14759</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.982922</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.342207</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.352616</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.600124</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.914474</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.889923</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">12</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.201666</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.228706</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">989</td>
+<td style="text-align: right;">989</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.803291</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">990</td>
+<td style="text-align: right;">990</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.216907</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">991</td>
+<td style="text-align: right;">991</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.98858</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">992</td>
+<td style="text-align: right;">992</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.501805</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">993</td>
+<td style="text-align: right;">993</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.676283</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">994</td>
+<td style="text-align: right;">994</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.204099</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">995</td>
+<td style="text-align: right;">995</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.982323</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">996</td>
+<td style="text-align: right;">996</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.859361</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">997</td>
+<td style="text-align: right;">997</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.233004</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">998</td>
+<td style="text-align: right;">998</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.982051</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">999</td>
+<td style="text-align: right;">999</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.893269</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">1000</td>
+<td style="text-align: right;">1000</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.570736</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="sample-from-posterior" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="sample-from-posterior"><span class="header-section-number">1.2</span> Sample from posterior</h3>
+<div id="b7fce438" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>posterior <span class="op">=</span> <span class="fu">sample</span>(<span class="fu">coin</span>(coin_flips), <span class="fu">NUTS</span>(), <span class="fl">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>┌ Info: Found initial step size
+└   ϵ = 0.8</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div class="ansi-escaped-output">
+<pre>Chains MCMC chain (1000×13×1 Array{Float64, 3}):
+Iterations        = 501:1:1500
+Number of chains  = 1
+Samples per chain = 1000
+Wall duration     = 2.53 seconds
+Compute duration  = 2.53 seconds
+parameters        = p
+internals         = lp, n_steps, is_accept, acceptance_rate, log_density, hamiltonian_energy, hamiltonian_energy_error, max_hamiltonian_energy_error, tree_depth, numerical_error, step_size, nom_step_size
+Summary Statistics
+ <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold"> ess_bulk </span> <span class="ansi-bold"> ess_tail </span> <span class="ansi-bold">    rhat </span> <span class="ansi-bold"> e</span> ⋯
+ <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  </span> ⋯
+           p    0.7082    0.0461    0.0019   590.2686   677.9923    1.0008     ⋯
+<span class="ansi-cyan-fg">                                                                1 column omitted</span>
+Quantiles
+ <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    2.5% </span> <span class="ansi-bold">   25.0% </span> <span class="ansi-bold">   50.0% </span> <span class="ansi-bold">   75.0% </span> <span class="ansi-bold">   97.5% </span>
+ <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span>
+           p    0.6128    0.6798    0.7105    0.7378    0.7954
+</pre>
+</div>
+</div>
+</div>
+<div id="e62ec647" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarystats</span>(prior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div class="ansi-escaped-output">
+<pre>Summary Statistics
+ <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold"> ess_bulk </span> <span class="ansi-bold"> ess_tail </span> <span class="ansi-bold">    rhat </span> <span class="ansi-bold"> e</span> ⋯
+ <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  </span> ⋯
+           p    0.5016    0.2885    0.0093   964.7822   940.1033    1.0021     ⋯
+<span class="ansi-cyan-fg">                                                                1 column omitted</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="f37518fd" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(posterior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div>
+<div><div style="float: left;"><span>1000×15 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">975 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">iteration</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">chain</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">p</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">lp</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">n_steps</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">is_accept</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">acceptance_rate</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">log_density</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">hamiltonian_energy</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">hamiltonian_energy_error</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">max_hamiltonian_energy_error</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">tree_depth</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">numerical_error</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">step_size</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">nom_step_size</th>
+</tr>
+<tr class="odd subheader headerLastRow">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">501</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.717998</td>
+<td style="text-align: right;">-61.828</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.757963</td>
+<td style="text-align: right;">-61.828</td>
+<td style="text-align: right;">62.1002</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.27712</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right;">502</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.740088</td>
+<td style="text-align: right;">-62.0934</td>
+<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.894529</td>
+<td style="text-align: right;">-62.0934</td>
+<td style="text-align: right;">62.1186</td>
+<td style="text-align: right;">0.142159</td>
+<td style="text-align: right;">0.185425</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: right;">503</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.740088</td>
+<td style="text-align: right;">-62.0934</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.138025</td>
+<td style="text-align: right;">-62.0934</td>
+<td style="text-align: right;">64.4317</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.98032</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: right;">504</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.740088</td>
+<td style="text-align: right;">-62.0934</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.312093</td>
+<td style="text-align: right;">-62.0934</td>
+<td style="text-align: right;">63.4736</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.16445</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: right;">505</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.662678</td>
+<td style="text-align: right;">-62.2271</td>
+<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.767041</td>
+<td style="text-align: right;">-62.2271</td>
+<td style="text-align: right;">62.5924</td>
+<td style="text-align: right;">-0.00127818</td>
+<td style="text-align: right;">0.524955</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
+<td style="text-align: right;">506</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.655636</td>
+<td style="text-align: right;">-62.3765</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.913276</td>
+<td style="text-align: right;">-62.3765</td>
+<td style="text-align: right;">62.6489</td>
+<td style="text-align: right;">0.0907169</td>
+<td style="text-align: right;">0.0907169</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">7</td>
+<td style="text-align: right;">507</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.609538</td>
+<td style="text-align: right;">-63.8566</td>
+<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.368152</td>
+<td style="text-align: right;">-63.8566</td>
+<td style="text-align: right;">64.3468</td>
+<td style="text-align: right;">0.927639</td>
+<td style="text-align: right;">1.18267</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">8</td>
+<td style="text-align: right;">508</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.641929</td>
+<td style="text-align: right;">-62.7267</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">-62.7267</td>
+<td style="text-align: right;">63.8323</td>
+<td style="text-align: right;">-0.714576</td>
+<td style="text-align: right;">-0.714576</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9</td>
+<td style="text-align: right;">509</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.68078</td>
+<td style="text-align: right;">-61.9414</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">-61.9414</td>
+<td style="text-align: right;">62.3927</td>
+<td style="text-align: right;">-0.473854</td>
+<td style="text-align: right;">-0.473854</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">10</td>
+<td style="text-align: right;">510</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.68078</td>
+<td style="text-align: right;">-61.9414</td>
+<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.123939</td>
+<td style="text-align: right;">-61.9414</td>
+<td style="text-align: right;">63.9924</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">2.85382</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">11</td>
+<td style="text-align: right;">511</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.68078</td>
+<td style="text-align: right;">-61.9414</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.185385</td>
+<td style="text-align: right;">-61.9414</td>
+<td style="text-align: right;">63.2305</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.68532</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">12</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.626875</td>
+<td style="text-align: right;">-63.1998</td>
+<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.668567</td>
+<td style="text-align: right;">-63.1998</td>
+<td style="text-align: right;">63.2018</td>
+<td style="text-align: right;">0.77562</td>
+<td style="text-align: right;">0.77562</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">13</td>
+<td style="text-align: right;">513</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.669213</td>
+<td style="text-align: right;">-62.1074</td>
+<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.960222</td>
+<td style="text-align: right;">-62.1074</td>
+<td style="text-align: right;">62.8031</td>
+<td style="text-align: right;">-0.671604</td>
+<td style="text-align: right;">-0.671604</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">989</td>
+<td style="text-align: right;">1489</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.721976</td>
+<td style="text-align: right;">-61.8564</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.970231</td>
+<td style="text-align: right;">-61.8564</td>
+<td style="text-align: right;">61.8636</td>
+<td style="text-align: right;">0.0302207</td>
+<td style="text-align: right;">0.0302207</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">990</td>
+<td style="text-align: right;">1490</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.721976</td>
+<td style="text-align: right;">-61.8564</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.0751755</td>
+<td style="text-align: right;">-61.8564</td>
+<td style="text-align: right;">63.6342</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">2.58793</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">991</td>
+<td style="text-align: right;">1491</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.686017</td>
+<td style="text-align: right;">-61.8859</td>
+<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.992161</td>
+<td style="text-align: right;">-61.8859</td>
+<td style="text-align: right;">61.9016</td>
+<td style="text-align: right;">0.0154505</td>
+<td style="text-align: right;">0.0154505</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">992</td>
+<td style="text-align: right;">1492</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.686017</td>
+<td style="text-align: right;">-61.8859</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.867892</td>
+<td style="text-align: right;">-61.8859</td>
+<td style="text-align: right;">62.0547</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.141688</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">993</td>
+<td style="text-align: right;">1493</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.686017</td>
+<td style="text-align: right;">-61.8859</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.143066</td>
+<td style="text-align: right;">-61.8859</td>
+<td style="text-align: right;">63.309</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.94445</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">994</td>
+<td style="text-align: right;">1494</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.686017</td>
+<td style="text-align: right;">-61.8859</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.296269</td>
+<td style="text-align: right;">-61.8859</td>
+<td style="text-align: right;">62.8227</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.21649</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">995</td>
+<td style="text-align: right;">1495</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.690538</td>
+<td style="text-align: right;">-61.8481</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">-61.8481</td>
+<td style="text-align: right;">61.8991</td>
+<td style="text-align: right;">-0.0219391</td>
+<td style="text-align: right;">-0.0219391</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">996</td>
+<td style="text-align: right;">1496</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.714896</td>
+<td style="text-align: right;">-61.8115</td>
+<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.884779</td>
+<td style="text-align: right;">-61.8115</td>
+<td style="text-align: right;">61.9816</td>
+<td style="text-align: right;">-0.0106187</td>
+<td style="text-align: right;">0.211995</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">997</td>
+<td style="text-align: right;">1497</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.769881</td>
+<td style="text-align: right;">-62.9041</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.564167</td>
+<td style="text-align: right;">-62.9041</td>
+<td style="text-align: right;">62.9198</td>
+<td style="text-align: right;">0.572406</td>
+<td style="text-align: right;">0.572406</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">998</td>
+<td style="text-align: right;">1498</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.821201</td>
+<td style="text-align: right;">-65.8279</td>
+<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.499564</td>
+<td style="text-align: right;">-65.8279</td>
+<td style="text-align: right;">65.836</td>
+<td style="text-align: right;">1.05356</td>
+<td style="text-align: right;">1.89714</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">999</td>
+<td style="text-align: right;">1499</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.785157</td>
+<td style="text-align: right;">-63.5502</td>
+<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.850635</td>
+<td style="text-align: right;">-63.5502</td>
+<td style="text-align: right;">65.5869</td>
+<td style="text-align: right;">-0.976817</td>
+<td style="text-align: right;">-1.6987</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">1000</td>
+<td style="text-align: right;">1500</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.781857</td>
+<td style="text-align: right;">-63.3961</td>
+<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.980302</td>
+<td style="text-align: right;">-63.3961</td>
+<td style="text-align: right;">64.2692</td>
+<td style="text-align: right;">-0.0706388</td>
+<td style="text-align: right;">-0.0827444</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.5545</td>
+<td style="text-align: right;">1.5545</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="prior-predictive-check" class="level3" data-number="1.3">
+<h3 data-number="1.3" class="anchored" data-anchor-id="prior-predictive-check"><span class="header-section-number">1.3</span> Prior predictive check</h3>
+<p>Here we pass in a vector containing <code>missing</code>. Sampling then generates observations.</p>
+<div id="4c365100" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>observations <span class="op">=</span> <span class="fu">Vector</span><span class="dt">{Missing}</span>(<span class="cn">missing</span>, <span class="fu">length</span>(coin_flips))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>prior_check <span class="op">=</span> <span class="fu">predict</span>(<span class="fu">coin</span>(observations), prior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<div class="ansi-escaped-output">
+<pre>Chains MCMC chain (1000×100×1 Array{Float64, 3}):
+Iterations        = 1:1:1000
+Number of chains  = 1
+Samples per chain = 1000
+parameters        = data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15], data[16], data[17], data[18], data[19], data[20], data[21], data[22], data[23], data[24], data[25], data[26], data[27], data[28], data[29], data[30], data[31], data[32], data[33], data[34], data[35], data[36], data[37], data[38], data[39], data[40], data[41], data[42], data[43], data[44], data[45], data[46], data[47], data[48], data[49], data[50], data[51], data[52], data[53], data[54], data[55], data[56], data[57], data[58], data[59], data[60], data[61], data[62], data[63], data[64], data[65], data[66], data[67], data[68], data[69], data[70], data[71], data[72], data[73], data[74], data[75], data[76], data[77], data[78], data[79], data[80], data[81], data[82], data[83], data[84], data[85], data[86], data[87], data[88], data[89], data[90], data[91], data[92], data[93], data[94], data[95], data[96], data[97], data[98], data[99], data[100]
+internals         = 
+Summary Statistics
+ <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold">  ess_bulk </span> <span class="ansi-bold"> ess_tail </span> <span class="ansi-bold">    rhat </span> <span class="ansi-bold"> </span> ⋯
+ <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">   Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> </span> ⋯
+     data[1]    0.5230    0.4997    0.0147   1157.0934        NaN    0.9995    ⋯
+     data[2]    0.4970    0.5002    0.0162    957.8177        NaN    0.9990    ⋯
+     data[3]    0.4790    0.4998    0.0171    852.2803        NaN    0.9995    ⋯
+     data[4]    0.5000    0.5003    0.0158   1000.9674        NaN       NaN    ⋯
+     data[5]    0.4930    0.5002    0.0158    996.2614        NaN    0.9990    ⋯
+     data[6]    0.4960    0.5002    0.0168    882.8375        NaN    1.0017    ⋯
+     data[7]    0.4920    0.5002    0.0160    976.4481        NaN    0.9993    ⋯
+     data[8]    0.4940    0.5002    0.0161    967.4698        NaN    0.9990    ⋯
+     data[9]    0.5130    0.5001    0.0156   1028.7241        NaN    0.9991    ⋯
+    data[10]    0.5070    0.5002    0.0162    953.9188        NaN    0.9992    ⋯
+    data[11]    0.4850    0.5000    0.0157   1008.2859        NaN    0.9997    ⋯
+    data[12]    0.5070    0.5002    0.0158   1003.4037        NaN    1.0015    ⋯
+    data[13]    0.5010    0.5002    0.0160    972.1132        NaN    0.9993    ⋯
+    data[14]    0.4910    0.5002    0.0155   1044.3628        NaN    0.9991    ⋯
+    data[15]    0.5040    0.5002    0.0159    990.3171        NaN    1.0000    ⋯
+    data[16]    0.5110    0.5001    0.0160    977.4628        NaN    0.9991    ⋯
+    data[17]    0.5150    0.5000    0.0151   1103.7482        NaN    0.9990    ⋯
+    data[18]    0.4930    0.5002    0.0156   1023.7561        NaN    0.9999    ⋯
+    data[19]    0.5070    0.5002    0.0162    957.7321        NaN    0.9993    ⋯
+    data[20]    0.4880    0.5001    0.0154   1051.4843        NaN    0.9990    ⋯
+    data[21]    0.5080    0.5002    0.0160    978.7747        NaN    0.9991    ⋯
+    data[22]    0.4950    0.5002    0.0155   1038.6265        NaN    1.0004    ⋯
+    data[23]    0.4920    0.5002    0.0163    943.3135        NaN    1.0013    ⋯
+      ⋮           ⋮         ⋮         ⋮          ⋮          ⋮          ⋮       ⋱
+<span class="ansi-cyan-fg">                                                    1 column and 77 rows omitted</span>
+Quantiles
+ <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    2.5% </span> <span class="ansi-bold">   25.0% </span> <span class="ansi-bold">   50.0% </span> <span class="ansi-bold">   75.0% </span> <span class="ansi-bold">   97.5% </span>
+ <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span>
+     data[1]    0.0000    0.0000    1.0000    1.0000    1.0000
+     data[2]    0.0000    0.0000    0.0000    1.0000    1.0000
+     data[3]    0.0000    0.0000    0.0000    1.0000    1.0000
+     data[4]    0.0000    0.0000    0.5000    1.0000    1.0000
+     data[5]    0.0000    0.0000    0.0000    1.0000    1.0000
+     data[6]    0.0000    0.0000    0.0000    1.0000    1.0000
+     data[7]    0.0000    0.0000    0.0000    1.0000    1.0000
+     data[8]    0.0000    0.0000    0.0000    1.0000    1.0000
+     data[9]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[10]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[11]    0.0000    0.0000    0.0000    1.0000    1.0000
+    data[12]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[13]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[14]    0.0000    0.0000    0.0000    1.0000    1.0000
+    data[15]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[16]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[17]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[18]    0.0000    0.0000    0.0000    1.0000    1.0000
+    data[19]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[20]    0.0000    0.0000    0.0000    1.0000    1.0000
+    data[21]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[22]    0.0000    0.0000    0.0000    1.0000    1.0000
+    data[23]    0.0000    0.0000    0.0000    1.0000    1.0000
+      ⋮           ⋮         ⋮         ⋮         ⋮         ⋮
+<span class="ansi-cyan-fg">                                                 77 rows omitted</span>
+</pre>
+</div>
+</div>
+</div>
+<p><code>prior_check</code> is a <code>Chains</code> instance. To convert to an <code>Array</code>, use</p>
+<div id="df32f5e0" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Array</span>(prior_check, [<span class="op">:</span>parameters])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>1000×100 Matrix{Float64}:
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  …  0.0  0.0  0.0  0.0  1.0  1.0  0.0
+ 0.0  1.0  1.0  1.0  0.0  1.0  1.0  1.0     0.0  1.0  1.0  0.0  1.0  0.0  1.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0     0.0  0.0  1.0  1.0  0.0  0.0  0.0
+ 1.0  1.0  1.0  1.0  0.0  1.0  1.0  0.0     1.0  1.0  1.0  1.0  0.0  1.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0     0.0  1.0  0.0  0.0  0.0  0.0  0.0
+ 1.0  0.0  1.0  1.0  1.0  1.0  1.0  1.0  …  1.0  1.0  1.0  1.0  1.0  1.0  1.0
+ 1.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0     1.0  0.0  0.0  1.0  0.0  0.0  1.0
+ 1.0  0.0  0.0  1.0  1.0  0.0  0.0  0.0     0.0  0.0  0.0  1.0  0.0  0.0  0.0
+ 0.0  1.0  1.0  0.0  1.0  1.0  1.0  0.0     1.0  0.0  0.0  1.0  1.0  1.0  0.0
+ 1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0     1.0  1.0  1.0  1.0  1.0  1.0  1.0
+ 0.0  1.0  1.0  1.0  0.0  1.0  1.0  1.0  …  1.0  1.0  0.0  1.0  1.0  0.0  1.0
+ 0.0  0.0  0.0  1.0  0.0  0.0  0.0  1.0     0.0  1.0  0.0  1.0  0.0  0.0  0.0
+ 1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0     1.0  1.0  1.0  0.0  0.0  0.0  0.0
+ ⋮                        ⋮              ⋱            ⋮                   
+ 0.0  1.0  1.0  0.0  1.0  1.0  1.0  1.0     1.0  1.0  1.0  1.0  1.0  1.0  1.0
+ 0.0  0.0  0.0  0.0  1.0  0.0  0.0  1.0     1.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 1.0  1.0  1.0  1.0  0.0  1.0  1.0  1.0  …  1.0  1.0  1.0  1.0  1.0  1.0  1.0
+ 1.0  0.0  0.0  0.0  1.0  0.0  0.0  1.0     1.0  0.0  0.0  0.0  0.0  1.0  1.0
+ 1.0  1.0  1.0  1.0  0.0  1.0  1.0  0.0     1.0  0.0  0.0  1.0  1.0  1.0  1.0
+ 0.0  0.0  0.0  0.0  1.0  1.0  0.0  0.0     0.0  0.0  0.0  1.0  1.0  0.0  0.0
+ 1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0     1.0  1.0  1.0  1.0  1.0  1.0  1.0
+ 1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  …  1.0  1.0  1.0  1.0  1.0  1.0  1.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0     1.0  1.0  0.0  0.0  0.0  1.0  0.0
+ 1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0     1.0  1.0  1.0  1.0  1.0  1.0  1.0
+ 1.0  1.0  1.0  0.0  1.0  1.0  1.0  1.0     1.0  1.0  1.0  1.0  1.0  1.0  1.0
+ 1.0  1.0  0.0  1.0  0.0  1.0  0.0  1.0     0.0  1.0  1.0  1.0  1.0  0.0  1.0</code></pre>
+</div>
+</div>
+</section>
+<section id="posterior-predictive-check" class="level3" data-number="1.4">
+<h3 data-number="1.4" class="anchored" data-anchor-id="posterior-predictive-check"><span class="header-section-number">1.4</span> Posterior predictive check</h3>
+<div id="d510a887" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>observations <span class="op">=</span> <span class="fu">Vector</span><span class="dt">{Missing}</span>(<span class="cn">missing</span>, <span class="fu">length</span>(coin_flips))</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>posterior_check <span class="op">=</span> <span class="fu">predict</span>(<span class="fu">coin</span>(observations), posterior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<div class="ansi-escaped-output">
+<pre>Chains MCMC chain (1000×100×1 Array{Float64, 3}):
+Iterations        = 1:1:1000
+Number of chains  = 1
+Samples per chain = 1000
+parameters        = data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15], data[16], data[17], data[18], data[19], data[20], data[21], data[22], data[23], data[24], data[25], data[26], data[27], data[28], data[29], data[30], data[31], data[32], data[33], data[34], data[35], data[36], data[37], data[38], data[39], data[40], data[41], data[42], data[43], data[44], data[45], data[46], data[47], data[48], data[49], data[50], data[51], data[52], data[53], data[54], data[55], data[56], data[57], data[58], data[59], data[60], data[61], data[62], data[63], data[64], data[65], data[66], data[67], data[68], data[69], data[70], data[71], data[72], data[73], data[74], data[75], data[76], data[77], data[78], data[79], data[80], data[81], data[82], data[83], data[84], data[85], data[86], data[87], data[88], data[89], data[90], data[91], data[92], data[93], data[94], data[95], data[96], data[97], data[98], data[99], data[100]
+internals         = 
+Summary Statistics
+ <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold">  ess_bulk </span> <span class="ansi-bold"> ess_tail </span> <span class="ansi-bold">    rhat </span> <span class="ansi-bold"> </span> ⋯
+ <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">   Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> </span> ⋯
+     data[1]    0.7430    0.4372    0.0134   1072.3149        NaN    0.9996    ⋯
+     data[2]    0.6910    0.4623    0.0154    906.1264        NaN    0.9991    ⋯
+     data[3]    0.7180    0.4502    0.0148    924.7892        NaN    0.9993    ⋯
+     data[4]    0.7060    0.4558    0.0146    975.4260        NaN    0.9991    ⋯
+     data[5]    0.6880    0.4635    0.0147    992.9012        NaN    0.9990    ⋯
+     data[6]    0.6890    0.4631    0.0143   1043.4965        NaN    1.0003    ⋯
+     data[7]    0.7060    0.4558    0.0151    914.4906        NaN    0.9990    ⋯
+     data[8]    0.6970    0.4598    0.0150    935.9213        NaN    1.0011    ⋯
+     data[9]    0.7100    0.4540    0.0170    714.6554        NaN    1.0018    ⋯
+    data[10]    0.7240    0.4472    0.0137   1068.6520        NaN    0.9992    ⋯
+    data[11]    0.6760    0.4682    0.0151    962.1669        NaN    1.0002    ⋯
+    data[12]    0.7010    0.4580    0.0153    895.2473        NaN    1.0001    ⋯
+    data[13]    0.7010    0.4580    0.0142   1038.8307        NaN    0.9994    ⋯
+    data[14]    0.7040    0.4567    0.0150    928.0940        NaN    0.9991    ⋯
+    data[15]    0.7170    0.4507    0.0144    983.5115        NaN    0.9990    ⋯
+    data[16]    0.6990    0.4589    0.0139   1095.3970        NaN    0.9996    ⋯
+    data[17]    0.7110    0.4535    0.0142   1023.9128        NaN    0.9996    ⋯
+    data[18]    0.7210    0.4487    0.0145    957.3748        NaN    0.9992    ⋯
+    data[19]    0.6650    0.4722    0.0158    890.8334        NaN    0.9990    ⋯
+    data[20]    0.7290    0.4447    0.0146    922.2537        NaN    0.9992    ⋯
+    data[21]    0.6900    0.4627    0.0151    934.9079        NaN    0.9993    ⋯
+    data[22]    0.6970    0.4598    0.0159    833.4933        NaN    1.0001    ⋯
+    data[23]    0.7110    0.4535    0.0149    924.5675        NaN    0.9996    ⋯
+      ⋮           ⋮         ⋮         ⋮          ⋮          ⋮          ⋮       ⋱
+<span class="ansi-cyan-fg">                                                    1 column and 77 rows omitted</span>
+Quantiles
+ <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    2.5% </span> <span class="ansi-bold">   25.0% </span> <span class="ansi-bold">   50.0% </span> <span class="ansi-bold">   75.0% </span> <span class="ansi-bold">   97.5% </span>
+ <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span>
+     data[1]    0.0000    0.0000    1.0000    1.0000    1.0000
+     data[2]    0.0000    0.0000    1.0000    1.0000    1.0000
+     data[3]    0.0000    0.0000    1.0000    1.0000    1.0000
+     data[4]    0.0000    0.0000    1.0000    1.0000    1.0000
+     data[5]    0.0000    0.0000    1.0000    1.0000    1.0000
+     data[6]    0.0000    0.0000    1.0000    1.0000    1.0000
+     data[7]    0.0000    0.0000    1.0000    1.0000    1.0000
+     data[8]    0.0000    0.0000    1.0000    1.0000    1.0000
+     data[9]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[10]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[11]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[12]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[13]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[14]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[15]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[16]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[17]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[18]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[19]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[20]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[21]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[22]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[23]    0.0000    0.0000    1.0000    1.0000    1.0000
+      ⋮           ⋮         ⋮         ⋮         ⋮         ⋮
+<span class="ansi-cyan-fg">                                                 77 rows omitted</span>
+</pre>
+</div>
+</div>
+</div>
+</section>
+<section id="chains" class="level3" data-number="1.5">
+<h3 data-number="1.5" class="anchored" data-anchor-id="chains"><span class="header-section-number">1.5</span> Chains</h3>
+<p>The results of sampling runs are <code>MCMCChains.Chains</code> instances.</p>
+<p>A <code>Chains</code> instance has the following fields:</p>
+<ul>
+<li>value: <code>AxisArray</code> object <code>:iter</code> x <code>:var</code> x <code>:chain</code></li>
+<li>logevidence</li>
+<li>name_map (to define sections, NamedTuple section -&gt; names, default section is <code>:parameters</code>)</li>
+<li>info</li>
+</ul>
+<div id="0717d698" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>value <span class="op">=</span> <span class="fu">rand</span>(<span class="fl">500</span>, <span class="fl">2</span>, <span class="fl">3</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>chn <span class="op">=</span> <span class="fu">Chains</span>(value, [<span class="op">:</span>a, <span class="op">:</span>b])</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>chn2 <span class="op">=</span> <span class="fu">Chains</span>(value, [<span class="st">"A[1]"</span>, <span class="st">"A[2]"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div class="ansi-escaped-output">
+<pre>Chains MCMC chain (500×2×3 Array{Float64, 3}):
+Iterations        = 1:1:500
+Number of chains  = 3
+Samples per chain = 500
+parameters        = A[1], A[2]
+Summary Statistics
+ <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold">  ess_bulk </span> <span class="ansi-bold">  ess_tail </span> <span class="ansi-bold">    rhat </span>  ⋯
+ <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">   Float64 </span> <span class="ansi-bright-black-fg">   Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span>  ⋯
+        A[1]    0.4948    0.2824    0.0070   1587.1995   1410.8704    0.9998   ⋯
+        A[2]    0.4918    0.2864    0.0075   1466.7437   1366.1185    0.9998   ⋯
+<span class="ansi-cyan-fg">                                                                1 column omitted</span>
+Quantiles
+ <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    2.5% </span> <span class="ansi-bold">   25.0% </span> <span class="ansi-bold">   50.0% </span> <span class="ansi-bold">   75.0% </span> <span class="ansi-bold">   97.5% </span>
+ <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span>
+        A[1]    0.0228    0.2608    0.4955    0.7333    0.9676
+        A[2]    0.0290    0.2362    0.4924    0.7415    0.9770
+</pre>
+</div>
+</div>
+</div>
+<p>One can restrict the output (an <code>AxisArray</code>) to some parameters by using <code>chn[:a]</code>, for example. To get a <code>Chains</code> instance with only parameter a, do <code>chn[[:a]]</code>. Weird!</p>
+<p>An <code>AxisArray</code> has fields <code>:axes</code> and <code>:data</code>. It has advanced indexing. I.e. to get only a slice of a dimension <code>:dim</code>, one can use <code>A[dim = idx]</code>, so in the case of a MCMC sample, we might use <code>chn.value[var = :a]</code>, or <code>chn.value[chain = 2]</code></p>
+<p><code>summarystats(chn; sections = :parameters)</code></p>
+<p><code>quantile(chn; sections = :parameters)</code></p>
+<p>or <code>describe(chn; sections = :parameters)</code> to get both at once</p>
+<p>Turings <code>sample</code> returns a <code>Chains</code> instance with sections <code>:parameters</code> and <code>:internals</code>.</p>
+<div id="9c4b82e4" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>posterior.name_map</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>(parameters = [:p], internals = [:lp, :n_steps, :is_accept, :acceptance_rate, :log_density, :hamiltonian_energy, :hamiltonian_energy_error, :max_hamiltonian_energy_error, :tree_depth, :numerical_error, :step_size, :nom_step_size])</code></pre>
+</div>
+</div>
+<p>To convert a chain to a DataFrame containing the <code>:parameters</code> section only, one can do</p>
+<div id="7eb9a2b9" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(posterior[posterior.name_map.parameters])</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># or DataFrame(MCMCchains.get_sections(posterior, :parameters))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<div>
+<div><div style="float: left;"><span>1000×3 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">975 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">iteration</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">chain</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">p</th>
+</tr>
+<tr class="odd subheader headerLastRow">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: right;">501</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.717998</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right;">502</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.740088</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: right;">503</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.740088</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: right;">504</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.740088</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: right;">505</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.662678</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
+<td style="text-align: right;">506</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.655636</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">7</td>
+<td style="text-align: right;">507</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.609538</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">8</td>
+<td style="text-align: right;">508</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.641929</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">9</td>
+<td style="text-align: right;">509</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.68078</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">10</td>
+<td style="text-align: right;">510</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.68078</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">11</td>
+<td style="text-align: right;">511</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.68078</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">12</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.626875</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">13</td>
+<td style="text-align: right;">513</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.669213</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+<td style="text-align: right;">⋮</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">989</td>
+<td style="text-align: right;">1489</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.721976</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">990</td>
+<td style="text-align: right;">1490</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.721976</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">991</td>
+<td style="text-align: right;">1491</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.686017</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">992</td>
+<td style="text-align: right;">1492</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.686017</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">993</td>
+<td style="text-align: right;">1493</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.686017</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">994</td>
+<td style="text-align: right;">1494</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.686017</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">995</td>
+<td style="text-align: right;">1495</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.690538</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">996</td>
+<td style="text-align: right;">1496</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.714896</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">997</td>
+<td style="text-align: right;">1497</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.769881</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">998</td>
+<td style="text-align: right;">1498</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.821201</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">999</td>
+<td style="text-align: right;">1499</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.785157</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">1000</td>
+<td style="text-align: right;">1500</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.781857</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
