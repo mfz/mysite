@@ -5,7 +5,6 @@ jupyter: julia-1.10
 draft: false
 ---
 
-
 Bayesian Latent Class Analysis (BLCA) is a powerful statistical method used to classify subjects into unobserved (latent) groups based on their responses to observed variables. The method relies on the Bayesian framework to incorporate prior knowledge and manage uncertainty, making it robust and flexible for various applications, such as in social sciences, medicine, and marketing.
 
 ### Basic Concepts of Latent Class Analysis (LCA)
@@ -16,7 +15,6 @@ In the Bayesian approach, we introduce prior distributions for the model paramet
 
 ### Generative model
 
-The plate diagram for the model is shown below:
 
 ```{dot}
 digraph G {
@@ -55,6 +53,7 @@ digraph G {
     theta -> y;
 }
 ```
+
 
 From the diagram we can see that the joint distribution can be decomposed into the 
 following factors
