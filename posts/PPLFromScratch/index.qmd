@@ -3,6 +3,7 @@ title: "PPL from scratch"
 description: "How to implement a (basic) probabilistic programming language in Julia"
 image: bayes.jpeg
 jupyter: julia-1.10
+categories: julia, Bayes
 draft: true
 ---
 

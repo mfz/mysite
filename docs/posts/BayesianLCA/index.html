@@ -173,7 +173,10 @@ window.Quarto = {
           Latent class analysis using Gibbs sampling and Expectation-Maximization
         </div>
       </div>
-                </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">julia, Bayes, MCMC, EM</div>
+              </div>
+                  </div>
   </div>
     
   
@@ -396,7 +399,7 @@ P(\mathbf{y}, \mathbf{c}, \mathbf{\Theta}, \pi | u, \alpha, \beta) \propto
 \]</span></p>
 <p>This shows that the posterior joint distribution factors into a Dirichlet posterior for <span class="math inline">\(\pi\)</span> and a product of Beta posteriors for <span class="math inline">\(\Theta\)</span>.</p>
 <p>We can generate data according to the above model using the following Julia code</p>
-<div id="68b69ea8" class="cell" data-execution_count="1">
+<div id="36c49882" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Distributions</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>C <span class="op">=</span> <span class="fl">2</span>       <span class="co"># number of classes, j = 1 .. C</span></span>
@@ -413,7 +416,7 @@ P(\mathbf{y}, \mathbf{c}, \mathbf{\Theta}, \pi | u, \alpha, \beta) \propto
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="fu">rand</span>.(<span class="fu">Bernoulli</span>.(Θ[c, <span class="op">:</span>]));</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="fc1e3b14" class="cell" data-execution_count="2">
+<div id="d651dfa1" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fu">Figure</span>(;size<span class="op">=</span>(<span class="fl">600</span>, <span class="fl">400</span>))</span>
@@ -474,7 +477,7 @@ P(c_i = j, \mathbf{y_i} | \mathbf{\Theta}, \pi) =
 <li>sample <span class="math inline">\(\mathbf{\Theta}\)</span> using <span class="math inline">\(N_{jk}\)</span></li>
 </ul></li>
 </ul>
-<div id="00a68e17" class="cell" data-execution_count="3">
+<div id="8d87f1ef" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">StatsBase</span>: sample, Weights</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">StatsFuns</span>: logsumexp</span>
@@ -544,7 +547,7 @@ P(c_i = j, \mathbf{y_i} | \mathbf{\Theta}, \pi) =
 <span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let’s look at trace plots of the sampled parameters:</p>
-<div id="960eadf4" class="cell" data-execution_count="4">
+<div id="11643de8" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fu">Figure</span>()</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(f[<span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="fl">1</span>], [x[<span class="fl">1</span>] for x <span class="kw">in</span> samples.<span class="cn">π</span>]; axis <span class="op">=</span> (;title <span class="op">=</span> <span class="st">"π"</span>))</span>

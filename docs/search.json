@@ -4,7 +4,7 @@
     "href": "posts.html",
     "title": "My Notes",
     "section": "",
-    "text": "Tensor notation\n\n\nIntroduction to tensor, index, or Einstein notation\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nBayesian Latent Class Analysis\n\n\nLatent class analysis using Gibbs sampling and Expectation-Maximization\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "Tensor notation\n\n\nIntroduction to tensor, index, or Einstein notation\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPendulum\n\n\n\njulia, physics\n\n\n\nSimulating a pendulum in Julia, analytically, numerically, and symbolically\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nBayesian Latent Class Analysis\n\n\n\njulia, Bayes, MCMC, EM\n\n\n\nLatent class analysis using Gibbs sampling and Expectation-Maximization\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "index.html",
@@ -12,6 +12,55 @@
     "title": "mysite",
     "section": "",
     "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\nFor a nice tutorial on how to create them visit https://ucsb-meds.github.io/creating-quarto-websites/"
+  },
+  {
+    "objectID": "posts/Pendulum/index.html",
+    "href": "posts/Pendulum/index.html",
+    "title": "Pendulum",
+    "section": "",
+    "text": "A pendulum can be modelled as a mass \\(m\\) on a weightless rod of length \\(l\\). The forces acting on the mass are gravity and the tension in the rod.\nWe can use Newton’s second law to derive equations of motion.\nThe component of gravity along the direction of the string is compensated by the tension in the string. Only the force perpendicular to the string is used to accelerate the mass. Here we consider arclength \\(s = l \\Theta\\)\n\\[\nm \\frac{\\mathrm{d}^2s}{\\mathrm{d}t^2} = - m g \\sin(\\Theta)\n\\]\n\\[\n\\frac{\\mathrm{d}^2\\Theta}{\\mathrm{d}t^2} = - \\frac{g}{l} \\sin(\\Theta)\n\\]\nThis is a non-linear ordinary differential equation (ODE) of second order."
+  },
+  {
+    "objectID": "posts/Pendulum/index.html#equations-of-motion",
+    "href": "posts/Pendulum/index.html#equations-of-motion",
+    "title": "Pendulum",
+    "section": "",
+    "text": "A pendulum can be modelled as a mass \\(m\\) on a weightless rod of length \\(l\\). The forces acting on the mass are gravity and the tension in the rod.\nWe can use Newton’s second law to derive equations of motion.\nThe component of gravity along the direction of the string is compensated by the tension in the string. Only the force perpendicular to the string is used to accelerate the mass. Here we consider arclength \\(s = l \\Theta\\)\n\\[\nm \\frac{\\mathrm{d}^2s}{\\mathrm{d}t^2} = - m g \\sin(\\Theta)\n\\]\n\\[\n\\frac{\\mathrm{d}^2\\Theta}{\\mathrm{d}t^2} = - \\frac{g}{l} \\sin(\\Theta)\n\\]\nThis is a non-linear ordinary differential equation (ODE) of second order."
+  },
+  {
+    "objectID": "posts/Pendulum/index.html#analytic-solution-of-linearized-ode",
+    "href": "posts/Pendulum/index.html#analytic-solution-of-linearized-ode",
+    "title": "Pendulum",
+    "section": "Analytic solution of linearized ODE",
+    "text": "Analytic solution of linearized ODE\nTo solve that equation analytically, it can be linearized using the Taylor expansion\n\\[\n\\sin(\\Theta) = \\Theta - \\frac{\\Theta^3}{3!} + \\frac{\\Theta^5}{5!} + \\ldots\n\\]\n\nusing CairoMakie\nusing LaTeXStrings\n\nset_theme!()\n\nΘ = range(0, π/2; length = 100)\napprox(Θ) = Θ - Θ^3/6 + Θ^5/120\n\nf = Figure()\na, p = lines(f[1,1], Θ, sin.(Θ); \n            linewidth = 7,\n            color = (:blue, 0.2), \n            label = L\"\\sin(Θ)\", \n            axis = (;title = \"Taylor approximation of sin(Θ)\", xlabel = L\"Θ\"))\nlines!(f[1,1], Θ, Θ; label = L\"Θ\")\nlines!(f[1,1], Θ, Θ - Θ .^ 3/6, label = L\"Θ - \\frac{Θ^3}{3!}\")\nlines!(f[1,1], Θ, Θ - Θ .^ 3 / 6 + Θ .^ 5 / 120, label = L\"Θ - \\frac{Θ^3}{3!} + \\frac{Θ^5}{5!}\")\n\naxislegend(a; position = :lt)\n\nf\n\n\n\n\n\n\n\n\nFor small angles (\\(\\Theta \\le 30°\\)) the first order Taylor approximation is reasonable. For larger angles, we overestimate the restoring force and, therefore, the frequency.\nThe resulting linear second-order ODE\n\\[\n\\frac{\\mathrm{d}^2\\Theta}{\\mathrm{d}t^2} = - \\frac{g}{l} \\Theta\n\\]\ncan be solved analytically with solution\n\\[\n\\Theta(t) = A \\cos(\\omega t) + B \\cos(\\omega t)\n\\]\nwith\n\\[\n\\omega = \\sqrt{\\frac{g}{l}}\n\\]\nThe solution to the linear ODE with \\(\\Theta_0 = \\pi/6 = 30°\\) is plotted below\n\ng = 9.81\nl = 1\nω = sqrt(g/l)\nt = range(0, 4*pi/ω, length = 200)\nΘ₀ = π/6\nanalytical = Θ₀ * cos.(ω*t)\n\nf2 = Figure()\n\nlines(f2[1,1], t, analytical * 180/pi;\n      axis = (;xlabel = \"time (s)\", ylabel = L\"$\\theta$ (deg)\"))\n\nf2"
+  },
+  {
+    "objectID": "posts/Pendulum/index.html#numerical-solution-of-non-linear-ode",
+    "href": "posts/Pendulum/index.html#numerical-solution-of-non-linear-ode",
+    "title": "Pendulum",
+    "section": "Numerical solution of non-linear ODE",
+    "text": "Numerical solution of non-linear ODE\nThe nonlinear ODE can be solved using DifferentialEquations.jl. First we need to tranform the 2-order ODE into a 1-order ODE.\nThe state \\(u(t)\\) is given as \\[\nu(t) = \\begin{pmatrix}\n    \\Theta(t) \\\\\n    \\dot{\\Theta}(t)\n    \\end{pmatrix}\n\\]\n\\[\n\\dot{u}(t) = \\begin{pmatrix}\n    \\dot{\\Theta}(t) \\\\\n    - \\frac{g}{l} \\sin(\\Theta(t))\n\\end{pmatrix}\n\\]\nNow we need to define a function that provides \\(\\dot{u}(t)\\) given \\(u(t)\\), \\(t\\), and possible parameters.\n\nfunction pendulum(u, params, t)\n    du = zeros(length(u))\n    l = params[1]\n    du[1] = u[2]\n    du[2] = -g/l*sin(u[1])\n    return du\nend;\n\n\nusing DifferentialEquations\n\ntspan = (0, 4π/ω)\nparams = [l]\ninit = [π/6, 0]\nprob = ODEProblem(pendulum, init, tspan, params);\n\nu = solve(prob) returns the solution to the ODEProblem. Note that the time stepping is done in an adaptive manner, but u(t) interpolates the system state for any time \\(t \\in\\) tspan.\n\nu = solve(prob)\n\nlines!(f2[1,1], t, 180/π*[u(ti)[1] for ti in t])\n\nf2\n\n\n\n\n\n\n\n\nAs already stated above, the small-angle approximation overestimates the frequency and underestimates the period."
+  },
+  {
+    "objectID": "posts/Pendulum/index.html#symbolic-solution-using-lagrangian",
+    "href": "posts/Pendulum/index.html#symbolic-solution-using-lagrangian",
+    "title": "Pendulum",
+    "section": "Symbolic solution using Lagrangian",
+    "text": "Symbolic solution using Lagrangian\nAbove, we had derived the equations of motion by hand. This is not always feasible. Julia has symbolic computation capabilities through the package Symbolics.jl. This allows us to use Julia as a computer algebra system (CAS) to derive the equations of motion from the Lagrangian, which is easy to specify.\nFirst we define the Lagrangian symbolically\n\nusing Symbolics\n\n@variables t m g l Θ(t)\n\n# define Theta, x, and y as above\nx = l*sin(Θ)\ny = -l*cos(Θ)\n\nDt = Differential(t)\n\n# define kinetic and potential energies\nT = 1/2*m*(Dt(x)^2 + Dt(y)^2)\nV = m*g*y\n\n# and the Lagrangian\nL = T - V;\n\nNote that Julia has not performed any differentiation yet. We need to call expand_derivatives to do so.\n\nexpand_derivatives(L)\n\n\\[ \\begin{equation}\ng l m \\cos\\left( \\Theta\\left( t \\right) \\right) + 0.5 \\left( \\sin^{2}\\left( \\Theta\\left( t \\right) \\right) \\left( \\frac{\\mathrm{d} \\Theta\\left( t \\right)}{\\mathrm{d}t} \\right)^{2} l^{2} + \\cos^{2}\\left( \\Theta\\left( t \\right) \\right) \\left( \\frac{\\mathrm{d} \\Theta\\left( t \\right)}{\\mathrm{d}t} \\right)^{2} l^{2} \\right) m\n\\end{equation}\n\\]\n\n\nTo get the equations of motion from the Lagrangian, we need to compute\n\\[\n\\frac{\\partial L}{\\partial \\Theta} - \\frac{\\mathrm{d}}{\\mathrm{d}t} \\frac{\\partial L}{\\partial \\dot{\\Theta}}\n\\]\nand solve for \\(\\ddot{\\Theta}\\). This can be done using symbolic_linear_solve.\n\nΘ̇ = Dt(Θ)\nΘ̈ = Dt(Θ̇)\nDΘ = Differential(Θ)\nDΘ̇ = Differential(Θ̇)\n\nLE = simplify(expand_derivatives(DΘ(L) -  Dt(DΘ̇(L))))\n\nu̇ = [Θ̇; simplify(symbolic_linear_solve(LE, Θ̈))]\n\n# define a function du(u, params, t) to be used in ODEProblem\ndu, du! = build_function(u̇, [Θ, Θ̇],  [l, g], t; expression = Val{false});\n\nThese functions can now be used to solve the DE numerically using DifferentialEquations.jl as above.\n\ntspan = (0, 4π/ω)\nparams = [1.0, 9.81]\ninit = [π/6, 0]\nprob = ODEProblem(du, init, tspan, params);\n\n\nsol = solve(prob)\n\nt = range(0, 4*pi/ω, length = 200)\nlines!(f2[1,1], t, 180/π*[sol(ti)[1] for ti in t])\n\nf2"
+  },
+  {
+    "objectID": "posts/Pendulum/index.html#animation",
+    "href": "posts/Pendulum/index.html#animation",
+    "title": "Pendulum",
+    "section": "Animation",
+    "text": "Animation\nWe can use the record function in CairoMakie.jl to create an animation.\n\n\nu1 = [u(ti)[1] for ti in t]\n\nf = Figure()\n\nax1 = Axis(f[1,1], xlabel = L\"t\", ylabel = L\"Θ\")\nxlims!(ax1, tspan...)\nylims!(ax1, -1,1)\n\nax2 = Axis(f[1,2]; aspect = 1)\nhidedecorations!(ax2)\nhidespines!(ax2)\nxlims!(ax2, -12,12)\nylims!(ax2, -12,12)\n\nr = 10.0\n\nrecord(f, \"incremental_plot_animation.gif\", 1:length(t), framerate = 30) do i\n\n    empty!(ax1)\n    lines!(ax1, t[1:i], u1[1:i]; color = :blue)\n    lines!(ax1, t[1:i], analytical[1:i]; color = :red)\n\n    empty!(ax2)\n    y = -r*cos(u1[i])\n    x = r*sin(u1[i])\n    lines!(ax2, [0,x], [0,y]; color = :blue)\n    scatter!(ax2, x, y; markersize = 20, color = :blue)\n\n    y = -r*cos(analytical[i])\n    x = r*sin(analytical[i])\n    lines!(ax2, [0,x], [0,y]; color = :red)\n    scatter!(ax2, x, y; markersize = 20, color = :red)\nend;\n\n\n\n\nAnimation"
+  },
+  {
+    "objectID": "posts/Pendulum/index.html#references",
+    "href": "posts/Pendulum/index.html#references",
+    "title": "Pendulum",
+    "section": "References",
+    "text": "References\n\nhttps://cooperrc.github.io/Julia-learning/day_05.html"
   },
   {
     "objectID": "posts/TensorNotation/index.html",

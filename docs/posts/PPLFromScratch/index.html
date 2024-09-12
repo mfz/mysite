@@ -173,7 +173,10 @@ window.Quarto = {
           How to implement a (basic) probabilistic programming language in Julia
         </div>
       </div>
-                </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">julia, Bayes</div>
+              </div>
+                  </div>
   </div>
     
   
@@ -243,13 +246,13 @@ P(\Theta|D, M) = \frac{P(D|\Theta, M)P(\Theta|M)}{P(D|M)}
 <p>Instead of providing the posterior/joint probability/likelihood in functional form, they allow to provide a model that generates samples (by sampling from distributions).</p>
 <p>Say program generates output <span class="math inline">\(y\)</span> based on draws of latent variables <span class="math inline">\(x\)</span>. The chosen <span class="math inline">\(x\)</span> are called the trace of the program. Given some observations <span class="math inline">\(y\)</span>, we want to draw inferences about which <span class="math inline">\(x\)</span> have been used to generate the observed <span class="math inline">\(y\)</span>, i.e.&nbsp;we want to infer <span class="math inline">\(P(x|y)\)</span>.</p>
 <p>A probabilistic program is a function consisting of a mix of stochastic and deterministic elements.</p>
-<div id="aeca623a" class="cell" data-execution_count="1">
+<div id="5fa76524" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Distributions</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">StatsBase</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="7914087d" class="cell" data-execution_count="2">
+<div id="78931730" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="st">plot prior, likelihood and posterior for BetaBinomial(α, β, y, n)</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
@@ -301,7 +304,7 @@ P(\Theta|D, M) = \frac{P(D|\Theta, M)P(\Theta|M)}{P(D|M)}
 </ul></li>
 <li>Randomly sample from grid values using discrete posterior as weights</li>
 </ol>
-<div id="2dd1cd8c" class="cell" data-execution_count="3">
+<div id="2b608336" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prior</span>(<span class="cn">π</span>) <span class="op">=</span> <span class="fu">pdf</span>(<span class="fu">Beta</span>(<span class="fl">45</span>, <span class="fl">55</span>), <span class="cn">π</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">likelihood</span>(<span class="cn">π</span>) <span class="op">=</span> <span class="fu">pdf</span>(<span class="fu">Binomial</span>(<span class="fl">50</span>, <span class="cn">π</span>), <span class="fl">30</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -401,7 +404,7 @@ Q(\Theta^t|\Theta') = Q(\Theta^t)
 <section id="beta-binomial-problem-using-independence-sampling" class="level4">
 <h4 class="anchored" data-anchor-id="beta-binomial-problem-using-independence-sampling">Beta-binomial problem using independence sampling</h4>
 <p>Here we solve the Beta-Binomial problem using independence sampling.</p>
-<div id="159ac9e2" class="cell" data-execution_count="4">
+<div id="c0c6e3ac" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># solve Beta-Binomial problem using independence sampling</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">logprior</span>(<span class="cn">π</span>) <span class="op">=</span> <span class="fu">logpdf</span>(<span class="fu">Beta</span>(<span class="fl">45</span>, <span class="fl">55</span>), <span class="cn">π</span>)</span>
@@ -437,14 +440,14 @@ Q(\Theta^t|\Theta') = Q(\Theta^t)
 <pre><code>metropolis_hastings (generic function with 1 method)</code></pre>
 </div>
 </div>
-<div id="3f6203dd" class="cell" data-execution_count="5">
+<div id="ef0a695b" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> samples <span class="op">=</span> <span class="fu">metropolis_hastings</span>(logprior, loglik, <span class="fl">0.5</span>, randproposal, logproposal, <span class="fl">10_000</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Acceptance ratio:0.1829
-  0.025652 seconds (37.44 k allocations: 3.380 MiB, 87.08% compilation time)</code></pre>
+<pre><code>Acceptance ratio:0.1905
+  0.025231 seconds (39.95 k allocations: 3.559 MiB, 86.56% compilation time)</code></pre>
 </div>
 </div>
-<div id="f5867b3b" class="cell" data-execution_count="6">
+<div id="bbec5efd" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fu">Figure</span>(;size <span class="op">=</span> (<span class="fl">800</span>, <span class="fl">400</span>))</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>ax1, plt1 <span class="op">=</span> <span class="fu">density</span>(f[<span class="fl">1</span>,<span class="fl">2</span>], samples; axis <span class="op">=</span> (;title <span class="op">=</span> <span class="st">"Density"</span>, xlabel <span class="op">=</span> <span class="st">"π"</span>, ylabel <span class="op">=</span> <span class="st">"P(π)"</span>), label <span class="op">=</span> <span class="st">"simulation"</span>)</span>
@@ -489,7 +492,7 @@ P_x(x)  = P_y(y(x))\frac{dy(x)}{dx} = P_y(\sigma(x))\frac{d \sigma(x)}{dx}
 \sigma'(x) = \sigma(x) (1 - \sigma(x)) = \sigma(x) \sigma(-x)
 \]</span></p>
 <p>Instead of drawing <span class="math inline">\(y\)</span> from <span class="math inline">\([0,1]\)</span> we draw <span class="math inline">\(x\)</span> from <span class="math inline">\((-\infty, +\infty)\)</span> using some proposal distribution. In the equation for the acceptance probability, we then replace each occurrence of <span class="math inline">\(P_y(y)\)</span> with <span class="math inline">\(P_x(x) = P_y(y = \sigma(x)) \sigma'(x)\)</span>.</p>
-<div id="becbce77" class="cell" data-execution_count="7">
+<div id="bd96b5a6" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># solve Beta-Binomial problem using constrained MCMC</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LogExpFunctions</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -534,14 +537,14 @@ P_x(x)  = P_y(y(x))\frac{dy(x)}{dx} = P_y(\sigma(x))\frac{d \sigma(x)}{dx}
 <pre><code>metropolis_hastings (generic function with 2 methods)</code></pre>
 </div>
 </div>
-<div id="560bd655" class="cell" data-execution_count="8">
+<div id="f3d1016f" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@time</span> samples2 <span class="op">=</span> <span class="fu">metropolis_hastings</span>(logprior, loglik, logjac, <span class="fl">0.0</span>, randproposal, logproposal, <span class="fl">10_000</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Acceptance ratio:0.3634
-  0.003151 seconds (45 allocations: 327.914 KiB)</code></pre>
+<pre><code>Acceptance ratio:0.3629
+  0.003095 seconds (45 allocations: 327.914 KiB)</code></pre>
 </div>
 </div>
-<div id="091ee7fa" class="cell" data-execution_count="9">
+<div id="d0f91dbb" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>samples2 <span class="op">=</span> <span class="fu">logistic</span>.(samples2);</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fu">Figure</span>(;size <span class="op">=</span> (<span class="fl">800</span>, <span class="fl">400</span>))</span>

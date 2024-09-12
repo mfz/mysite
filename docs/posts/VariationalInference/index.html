@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="VI as an approximate method for Bayesian inference">
 
-<title>mysite - My Notes</title>
+<title>mysite - Variational Inference</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,24 +24,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -68,35 +67,6 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
 
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -128,17 +98,17 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
 <body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">mysite</span>
     </a>
   </div>
@@ -149,7 +119,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./posts.html" aria-current="page"> 
+    <a class="nav-link" href="../../posts.html"> 
 <span class="menu-text">My Notes</span></a>
   </li>  
 </ul>
@@ -160,117 +130,103 @@ window.Quarto = {
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Variational Inference</h1>
+                  <div>
+        <div class="description">
+          VI as an approximate method for Bayesian inference
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">julia, Bayes</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(3)</span></div><div class="category" data-category="julia, Bayes, MCMC, EM">julia, Bayes, MCMC, EM <span class="quarto-category-count">(1)</span></div><div class="category" data-category="julia, physics">julia, physics <span class="quarto-category-count">(1)</span></div></div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#kullback-leibler-divergence" id="toc-kullback-leibler-divergence" class="nav-link active" data-scroll-target="#kullback-leibler-divergence">Kullback-Leibler divergence</a></li>
+  <li><a href="#variational-inference" id="toc-variational-inference" class="nav-link" data-scroll-target="#variational-inference">Variational inference</a></li>
+  <li><a href="#mean-field-approximation" id="toc-mean-field-approximation" class="nav-link" data-scroll-target="#mean-field-approximation">Mean field approximation</a></li>
+  <li><a href="#black-box-variational-inference" id="toc-black-box-variational-inference" class="nav-link" data-scroll-target="#black-box-variational-inference">Black-box variational inference</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">My Notes</h1>
-</div>
-
-
-
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-
-</header>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
 
 
+<p>Suppose we have a Bayesian model with a set of parameters and latent variables, denoted as <span class="math inline">\(\mathbf{Z}\)</span>. Our goal is to infer the conditional distribution <span class="math inline">\(p(\mathrm{Z}|\mathrm{X})\)</span>, where <span class="math inline">\(\mathrm{X}\)</span> denotes the data.</p>
+<p>For many models it is infeasible to compute <span class="math inline">\(p(\mathbf{Z}|\mathbf{X})\)</span> analytically. One then has to resort to approximation schemes like MCMC or variational inference (VI).</p>
+<p>The basic idea of VI is to <strong>reformulate the statistical inference problem as an optimization problem</strong>. Therefore, variational inference can often give the speed advantages of MAP estimation, but the statistical advantages of the Bayesian approach.</p>
+<section id="kullback-leibler-divergence" class="level3">
+<h3 class="anchored" data-anchor-id="kullback-leibler-divergence">Kullback-Leibler divergence</h3>
+<p>Let’s assume a system can be described by a probability density function <span class="math inline">\(p(\mathbf{X})\)</span>. We expect to observe those <span class="math inline">\(\mathbf{X}\)</span> that are most likely. If we observe an unlikely <span class="math inline">\(\mathbf{X}\)</span>, we will be surprised. We can use <span class="math inline">\(-\log p(\mathbf{X})\)</span> as a quantitative measure of this surprise.</p>
+<p>The average surprise, or uncertainty, when using a model <span class="math inline">\(p(\mathbf{X})\)</span> is the so-called entropy</p>
+<p><span class="math display">\[
+H[p] =  - \int p(x) \log p(x) \mathrm{d}x
+\]</span></p>
+<p>The cross entropy is the average surprise or uncertainty when using a different model / probability distribution <span class="math inline">\(q(\mathbf{X})\)</span> than <span class="math inline">\(p(\mathbf{X})\)</span> to describe the system.</p>
+<p><span class="math display">\[
+H_q[p] = - \int p(x) \log q(x) \mathrm{d}x
+\]</span></p>
+<p>The Kullback-Leibler divergence (not a distance as it is not symmetric!) is the increase in surprise/uncertainty when assuming model <span class="math inline">\(q(\mathbf{X})\)</span> while model <span class="math inline">\(p(\mathbf{X})\)</span> is the correct one; in other words, KL divergence tells how much the model represented by <span class="math inline">\(q(\mathbf{X})\)</span> still needs to learn.</p>
+<p><span class="math display">\[
+KL(p||q) = H_q(p) - H(p) = (-p \log q) - (-p \log p) = p \log \frac{p}{q}
+\]</span></p>
+<p><span class="math display">\[
+KL(p||q) = \int p(x) \log \frac{p(x)}{q(x)} \mathrm{d}x
+\]</span></p>
+<p>Often the Kullback-Leibler divergence is used to approximate a complicated (or unknown) probability density <span class="math inline">\(p(x)\)</span> by a simpler one <span class="math inline">\(q(x)\)</span>. <span class="math inline">\(KL(p||q)\)</span> contains a term <span class="math inline">\(p(x) \log q(x)\)</span>. For <span class="math inline">\(q(x) \to 0\)</span>, <span class="math inline">\(\log q(x) \to -\infty\)</span>. To avoid that <span class="math inline">\(KL(p||q)\)</span> diverges, we require <span class="math inline">\(p(x) = 0\)</span> whereever <span class="math inline">\(q(x) = 0\)</span>. That is, the approximation <span class="math inline">\(q(x)\)</span> can only be <span class="math inline">\(0\)</span> where <span class="math inline">\(p(x) = 0\)</span>, such that we require <span class="math inline">\(q(x)&gt;0\)</span> whereever <span class="math inline">\(p(x) &gt; 0\)</span>. If <span class="math inline">\(p(x)\)</span> is multi-modal, <span class="math inline">\(q(x)\)</span> needs to cover all the modes. It might therefore also cover regions of low probability, which could result in a poor model fit.</p>
+<p>For the reverse Kullback-Leibler divergence <span class="math inline">\(KL(q||p)\)</span>, the roles of <span class="math inline">\(q\)</span> and <span class="math inline">\(p\)</span> are switched. To avoid divergence of the reverse KL, we require <span class="math inline">\(q(x) = 0\)</span> whereever <span class="math inline">\(p(x) = 0\)</span>. In that case, if <span class="math inline">\(p(x)\)</span> is multi-modal and the modes are isolated by forbidden regions, <span class="math inline">\(q(x)\)</span> can only cover a single mode.</p>
+</section>
+<section id="variational-inference" class="level3">
+<h3 class="anchored" data-anchor-id="variational-inference">Variational inference</h3>
+<p>In VI, we approximate <span class="math inline">\(p(\mathbf{Z}|\mathbf{X})\)</span> by a parameterized distribution <span class="math inline">\(q_\lambda(\mathbf{Z})\)</span>, where <span class="math inline">\(\lambda\)</span> denotes the set of parameters. <span class="math inline">\(q_\lambda(\mathbf{Z})\)</span> is chosed to <strong>minimize the reverse Kullback-Leibler divergence</strong> (KL)</p>
+<p><span class="math display">\[
+KL(q_\lambda(\mathbf{Z})||p(\mathbf{Z}|\mathbf{X})) = \int  q_\lambda(\mathbf{Z})
+   \log \left( \frac{p(\mathbf{Z}|\mathbf{X})}{q_\lambda(\mathbf{Z}) } \right) \mathrm{d}\mathbf{Z}
+\]</span></p>
+<p>The reverse KL is chosen to make the computation tractable. It implies that <span class="math inline">\(q_\lambda(\mathbf{Z}) = 0\)</span> for <span class="math inline">\(p(\mathbf{Z}|\mathbf{X}) = 0\)</span>, as otherwise the reverse KL would diverge. For a multi-modal <span class="math inline">\(p(\mathbf{Z}|\mathbf{X})\)</span>, VI will, therefore, only cover a single mode.</p>
+</section>
+<section id="mean-field-approximation" class="level3">
+<h3 class="anchored" data-anchor-id="mean-field-approximation">Mean field approximation</h3>
+</section>
+<section id="black-box-variational-inference" class="level3">
+<h3 class="anchored" data-anchor-id="black-box-variational-inference">Black-box variational inference</h3>
+</section>
+<section id="references" class="level3">
+<h3 class="anchored" data-anchor-id="references">References</h3>
+<ul>
+<li>Bishop C.(2006), Pattern Recognition and Machine Learning, Chapter 10</li>
+<li>Murphy K.(2012), Machine learning - a probabilistic perspective, Chapter 21</li>
+</ul>
 
-<div class="quarto-listing quarto-listing-container-grid" id="listing-listing">
-<div class="list grid quarto-listing-cols-3">
-<div class="g-col-1" data-index="0" data-listing-file-modified-sort="1714588935904" data-listing-reading-time-sort="2" data-listing-word-count-sort="281">
-<a href="./posts/TensorNotation/index.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<p class="card-img-top">
-<img src="./posts/TensorNotation/Einstein.jpeg" class="thumbnail-image card-img" style="height: 150px;">
-</p>
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Tensor notation
-</h5>
-<div class="card-text listing-description">
-Introduction to tensor, index, or Einstein notation
-</div>
-<div class="card-attribution card-text-small start">
-<div class="listing-author">
 
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="1" data-categories="julia, physics" data-listing-file-modified-sort="1726132174462" data-listing-reading-time-sort="6" data-listing-word-count-sort="1001">
-<a href="./posts/Pendulum/index.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<p class="card-img-top"><img src="posts/Pendulum/index_files/figure-html/cell-2-output-1.svg" style="height: 150px;"  class="thumbnail-image card-img"/></p>
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Pendulum
-</h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('julia, physics'); return false;">
-julia, physics
-</div>
-</div>
-<div class="card-text listing-description">
-Simulating a pendulum in Julia, analytically, numerically, and symbolically
-</div>
-<div class="card-attribution card-text-small start">
-<div class="listing-author">
+</section>
 
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="2" data-categories="julia, Bayes, MCMC, EM" data-listing-file-modified-sort="1720982997936" data-listing-reading-time-sort="10" data-listing-word-count-sort="1846">
-<a href="./posts/BayesianLCA/index.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<p class="card-img-top"><img src="posts/BayesianLCA/index_files/figure-html/cell-3-output-2.svg" style="height: 150px;"  class="thumbnail-image card-img"/></p>
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Bayesian Latent Class Analysis
-</h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('julia, Bayes, MCMC, EM'); return false;">
-julia, Bayes, MCMC, EM
-</div>
-</div>
-<div class="card-text listing-description">
-Latent class analysis using Gibbs sampling and Expectation-Maximization
-</div>
-<div class="card-attribution card-text-small start">
-<div class="listing-author">
-
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

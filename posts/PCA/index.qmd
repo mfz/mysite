@@ -1,0 +1,111 @@
+---
+title: "Principal Component Analysis (PCA) using SVD"
+description: "PCA from scratch in Julia"
+jupyter: julia-1.10
+categories: julia
+draft: true
+---
+
+Principal Component Analysis (PCA) is a powerful technique for dimensionality reduction. It transforms data into a lower-dimensional space, making the data easier to understand and work with. 
+
+Let $\mathbf{X}$ be the $p \times n$ data matrix, with $p$ features as rows and $n$ samples as columns. (Note that this corresponds to the transpose of the 'tidy data' convention where columns are variables and rows are samples.) 
+
+In a first step, the features are standardized to mean 0 and standard deviation 1
+
+$$
+\mathbf{Z} = \frac{\mathbf{X} - \mathbf{\mu}}{\mathbf{\sigma}}
+$$
+
+The principal components are the eigenvectors of the feature correlation matrix $\mathbf{Z} \mathbf{Z}^T$.
+
+$$
+\mathbf{Z} \mathbf{Z}^T \mathbf{u} = \lambda \mathbf{u}
+$$
+
+Given the Singular Value Decomposition (SVD) of $\mathbf{Z}$
+
+$$
+\mathbf{Z} = \mathbf{U}\mathbf{S}\mathbf{V}^T
+$$
+
+where $\mathbf{U}$ and $\mathbf{V}$ are rotation matrices and
+$\mathbf{S}$ a diagonal matrix,  
+we can express the correlation matrix as
+
+$$
+\mathbf{Z} \mathbf{Z}^T = \mathbf{U}\mathbf{S}\mathbf{V}^T 
+  \mathbf{V}\mathbf{S}\mathbf{U}^T = 
+  \mathbf{U}\mathbf{S}^2\mathbf{U}^T
+$$
+
+
+```{julia}
+using LinearAlgebra
+using StatsBase
+
+"""
+        pca_svd
+
+Perform PCA on matrix `X` (rows are features, columns are samples)
+using Singular value decomposition (SVD)
+"""
+function pca_svd(X::AbstractMatrix{T}; center = true, scale = true) where {T <: Real}
+
+    p, n = size(X)
+
+    mu = center ? mean(X; dims = 2) : zeros(T, p)
+    sigma = scale ? std(X; dims = 2) : ones(T, p)
+    Z = (X .- mu) ./ sigma
+
+    s = svd(Z)  # Z = USV'; ZZ' = US^2U'
+
+    V = s.U
+    lambda = abs2.(s.S) ./ (n - 1)
+
+    return (;V, lambda)
+end
+;
+```
+
+```{julia}
+using RDatasets
+
+iris = dataset("datasets", "iris");
+X = Matrix(select(iris, Between(:SepalLength, :PetalWidth)))'
+
+s = pca_svd(X);
+```
+
+```{julia}
+using CairoMakie
+set_theme!()
+
+species_colors = Dict("setosa" => :red, "versicolor" => :green, "virginica" => :blue)
+colors = [species_colors[species] for species in iris.Species]
+
+Z = (X .- mean(X; dims = 2)) ./ std(X;dims = 2)
+
+scatter(Z' * s.V[:, 1:2], color = colors,
+       axis = (;title = "pca_svd"))
+```
+
+```{julia}
+varexp = s.lambda / sum(s.lambda)
+
+lines(varexp * 100; 
+      axis = (;xlabel = "Principal component", 
+               ylabel = "Variance explained [%]"))
+```
+
+Compare to MultivariateStats.jl. In order to get all 4 principal components, we need to set `pratio = 1.0`
+
+```{julia}
+using MultivariateStats
+
+
+pca = fit(PCA, Z; pratio = 1.0, method = :cov)
+Z_pca = MultivariateStats.transform(pca, Z)
+
+scatter(Z_pca[1:2,:], color = colors, 
+       axis = (;title = "MultivariateStats"))
+```

@@ -1,0 +1,317 @@
+---
+title: "Pendulum"
+description: "Simulating a pendulum in Julia, analytically, numerically, and symbolically"
+jupyter: julia-1.10
+categories: julia, physics
+draft: false
+---
+
+## Equations of motion 
+
+A pendulum can be modelled as a mass $m$ on a weightless rod of length $l$.
+The forces acting on the mass are gravity and the tension in the rod.
+
+We can use Newton's second law to derive equations of motion.
+
+The component of gravity along the direction of the string is compensated by
+the tension in the string. Only the force perpendicular to the string is used
+to accelerate the mass. Here we consider arclength $s = l \Theta$
+
+$$
+m \frac{\mathrm{d}^2s}{\mathrm{d}t^2} = - m g \sin(\Theta)
+$$
+
+$$
+\frac{\mathrm{d}^2\Theta}{\mathrm{d}t^2} = - \frac{g}{l} \sin(\Theta) 
+$$
+
+This is a non-linear ordinary differential equation (ODE) of second order.
+
+## Analytic solution of linearized ODE
+
+To solve that equation analytically, it can be linearized using the Taylor expansion
+
+$$
+\sin(\Theta) = \Theta - \frac{\Theta^3}{3!} + \frac{\Theta^5}{5!} + \ldots
+$$
+
+```{julia}
+using CairoMakie
+using LaTeXStrings
+
+set_theme!()
+
+Θ = range(0, π/2; length = 100)
+approx(Θ) = Θ - Θ^3/6 + Θ^5/120
+
+f = Figure()
+a, p = lines(f[1,1], Θ, sin.(Θ); 
+            linewidth = 7,
+            color = (:blue, 0.2), 
+            label = L"\sin(Θ)", 
+            axis = (;title = "Taylor approximation of sin(Θ)", xlabel = L"Θ"))
+lines!(f[1,1], Θ, Θ; label = L"Θ")
+lines!(f[1,1], Θ, Θ - Θ .^ 3/6, label = L"Θ - \frac{Θ^3}{3!}")
+lines!(f[1,1], Θ, Θ - Θ .^ 3 / 6 + Θ .^ 5 / 120, label = L"Θ - \frac{Θ^3}{3!} + \frac{Θ^5}{5!}")
+
+axislegend(a; position = :lt)
+
+f
+```
+
+For small angles ($\Theta \le 30°$) the first order Taylor approximation is reasonable. For larger angles,
+we overestimate the restoring force and, therefore, the frequency.
+
+The resulting linear second-order ODE 
+
+$$
+\frac{\mathrm{d}^2\Theta}{\mathrm{d}t^2} = - \frac{g}{l} \Theta 
+$$
+
+can be solved analytically with solution
+
+$$
+\Theta(t) = A \cos(\omega t) + B \cos(\omega t)
+$$
+
+with
+
+$$
+\omega = \sqrt{\frac{g}{l}}
+$$
+
+The solution to the linear ODE with $\Theta_0 = \pi/6 = 30°$ is plotted below
+
+```{julia}
+g = 9.81
+l = 1
+ω = sqrt(g/l)
+t = range(0, 4*pi/ω, length = 200)
+Θ₀ = π/6
+analytical = Θ₀ * cos.(ω*t)
+
+f2 = Figure()
+
+lines(f2[1,1], t, analytical * 180/pi;
+      axis = (;xlabel = "time (s)", ylabel = L"$\theta$ (deg)"))
+
+f2
+```
+
+## Numerical solution of non-linear ODE
+
+The nonlinear ODE can be solved using `DifferentialEquations.jl`. 
+First we need to tranform the 2-order ODE into a 1-order ODE.
+
+The state $u(t)$ is given as
+$$
+u(t) = \begin{pmatrix}
+    \Theta(t) \\
+    \dot{\Theta}(t)
+    \end{pmatrix}
+$$
+
+$$
+\dot{u}(t) = \begin{pmatrix}
+    \dot{\Theta}(t) \\
+    - \frac{g}{l} \sin(\Theta(t))
+\end{pmatrix}
+$$
+
+Now we need to define a function that provides $\dot{u}(t)$ given $u(t)$, $t$, and possible parameters.
+
+```{julia}
+function pendulum(u, params, t)
+    du = zeros(length(u))
+    l = params[1]
+    du[1] = u[2]
+    du[2] = -g/l*sin(u[1])
+    return du
+end;
+```
+
+```{julia}
+using DifferentialEquations
+
+tspan = (0, 4π/ω)
+params = [l]
+init = [π/6, 0]
+prob = ODEProblem(pendulum, init, tspan, params);
+```
+
+`u = solve(prob)` returns the solution to the `ODEProblem`.
+Note that the time stepping is done in an adaptive manner, but
+`u(t)` interpolates the system state for any time $t \in$ `tspan`.
+
+```{julia}
+u = solve(prob)
+
+lines!(f2[1,1], t, 180/π*[u(ti)[1] for ti in t])
+
+f2
+```
+
+As already stated above, the small-angle approximation overestimates the frequency and underestimates the period.  
+
+
+## Symbolic solution using Lagrangian
+
+Above, we had derived the equations of motion by hand. This is not always feasible.
+Julia has symbolic computation capabilities through the package `Symbolics.jl`.
+This allows us to use Julia as a computer algebra system (CAS) to derive the equations 
+of motion from the Lagrangian, which is easy to specify.
+
+First we define the Lagrangian symbolically
+
+```{julia}
+using Symbolics
+
+@variables t m g l Θ(t)
+
+# define Theta, x, and y as above
+x = l*sin(Θ)
+y = -l*cos(Θ)
+
+Dt = Differential(t)
+
+# define kinetic and potential energies
+T = 1/2*m*(Dt(x)^2 + Dt(y)^2)
+V = m*g*y
+
+# and the Lagrangian
+L = T - V;
+```
+
+Note that Julia has not performed any differentiation yet.
+We need to call `expand_derivatives` to do so.
+
+```{julia}
+expand_derivatives(L)
+```
+
+To get the equations of motion from the Lagrangian, we need to compute
+
+$$
+\frac{\partial L}{\partial \Theta} - \frac{\mathrm{d}}{\mathrm{d}t} \frac{\partial L}{\partial \dot{\Theta}}
+$$
+
+and solve for $\ddot{\Theta}$. This can be done using `symbolic_linear_solve`.
+
+```{julia}
+Θ̇ = Dt(Θ)
+Θ̈ = Dt(Θ̇)
+DΘ = Differential(Θ)
+DΘ̇ = Differential(Θ̇)
+
+LE = simplify(expand_derivatives(DΘ(L) -  Dt(DΘ̇(L))))
+
+u̇ = [Θ̇; simplify(symbolic_linear_solve(LE, Θ̈))]
+
+# define a function du(u, params, t) to be used in ODEProblem
+du, du! = build_function(u̇, [Θ, Θ̇],  [l, g], t; expression = Val{false});
+```
+
+These functions can now be used to solve the DE numerically using `DifferentialEquations.jl` as above.
+
+```{julia}
+tspan = (0, 4π/ω)
+params = [1.0, 9.81]
+init = [π/6, 0]
+prob = ODEProblem(du, init, tspan, params);
+```
+
+```{julia}
+sol = solve(prob)
+
+t = range(0, 4*pi/ω, length = 200)
+lines!(f2[1,1], t, 180/π*[sol(ti)[1] for ti in t])
+
+f2
+```
+
+
+## Animation
+
+We can use the `record` function in `CairoMakie.jl` to create an animation.
+
+<!--
+```{julia}
+u1 = [u(ti)[1] for ti in t]
+
+anim = Figure()
+ax, lineplot =  lines(anim[1,1], t[1:1], u1[1:1])
+xlims!(ax, 0, 2)
+ylims!(ax, -3,3)
+
+record(anim, "incremental_plot_animation.gif", 1:length(t), framerate = 30) do i
+    # Update the plot to show the first i points
+    push!(lineplot[1][],Point2f(t[i], u1[i]))
+end
+```
+
+
+
+```{julia}
+u1 = [u(ti)[1] for ti in t]
+
+anim = Figure()
+ax, lineplot =  lines(anim[1,1], t[1:1], u1[1:1]; axis = (;title = "Animation"))
+xlims!(ax, 0, 2)
+ylims!(ax, -3,3)
+
+record(anim, "incremental_plot_animation.gif", 1:length(t), framerate = 30) do i
+    # Update the plot to show the first i points
+    #empty!(anim)
+    #ax, lineplot  = lines(anim[1,1], t[1:i], u1[1:i])
+    #xlims!(ax, 0, 2)
+    #ylims!(ax, -3,3)
+
+    empty!(ax)
+    lines!(ax, t[1:i], u1[1:i]; color = :blue)
+end
+```
+-->
+
+```{julia}
+u1 = [u(ti)[1] for ti in t]
+
+f = Figure()
+
+ax1 = Axis(f[1,1], xlabel = L"t", ylabel = L"Θ")
+xlims!(ax1, tspan...)
+ylims!(ax1, -1,1)
+
+ax2 = Axis(f[1,2]; aspect = 1)
+hidedecorations!(ax2)
+hidespines!(ax2)
+xlims!(ax2, -12,12)
+ylims!(ax2, -12,12)
+
+r = 10.0
+
+record(f, "incremental_plot_animation.gif", 1:length(t), framerate = 30) do i
+
+    empty!(ax1)
+    lines!(ax1, t[1:i], u1[1:i]; color = :blue)
+    lines!(ax1, t[1:i], analytical[1:i]; color = :red)
+
+    empty!(ax2)
+    y = -r*cos(u1[i])
+    x = r*sin(u1[i])
+    lines!(ax2, [0,x], [0,y]; color = :blue)
+    scatter!(ax2, x, y; markersize = 20, color = :blue)
+
+    y = -r*cos(analytical[i])
+    x = r*sin(analytical[i])
+    lines!(ax2, [0,x], [0,y]; color = :red)
+    scatter!(ax2, x, y; markersize = 20, color = :red)
+end;
+
+```
+
+![Animation](incremental_plot_animation.gif)
+
+
+## References
+
+- https://cooperrc.github.io/Julia-learning/day_05.html

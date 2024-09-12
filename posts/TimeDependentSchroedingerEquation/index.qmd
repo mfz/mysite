@@ -1,0 +1,205 @@
+---
+title: "Time-dependent Schrödinger equation"
+description: "Solving the time-dependent Schrödinger equation in Julia"
+jupyter: julia-1.10
+categories: julia
+draft: true
+---
+
+The one-dimensional time-dependent Schrödinger equation (TDSE) for a potential $V(x)$ 
+is given by
+
+$$
+i\hbar \frac{\partial \psi(x,t)}{\partial t} = -\frac{\hbar^2}{2m} \frac{\partial^2 \psi(x,t)}{\partial x^2} + V(x) \psi(x,t)
+$$
+
+We also need to specify 
+
+- a domain $0 \le x \le L$,
+- initial conditions $\psi(x, t=0) = \psi_0(x)$ and 
+- boundary conditions $\psi(0,t)=0$ and $\psi(L,t)=0$.
+
+## Solve using finite difference method
+
+Using finite differences, we can discretize the TDSE as
+
+$$
+\psi_i^{n+1} = \psi_i^n + 
+   \frac{i \hbar \Delta t}{2m (\Delta x)^2} \left( \psi_{i+1}^n - 2\psi_i^n + \psi_{i-1}^n \right) - 
+   \frac{i \Delta t}{\hbar} V(x_i) \psi_i^n
+$$
+
+
+Assuming a potential of the form
+
+$$
+V(x) = - 10^4 \exp\left(-\frac{(x - L/2)^2}{2(L/20)^2} \right)
+$$
+
+
+
+```{julia}
+using CairoMakie
+using LaTeXStrings
+
+nx = 301
+nt = 100001
+L = 1.0
+T = 0.01
+dx = L / (nx - 1)
+dt = T / (nt - 1)
+x = range(0.0, L; length = nx)
+
+V = @. -10000 * exp(-(x - L/2.)^2 / 2 / (L/20.)^2)
+
+lines(x, V; axis = (;ylabel = "V(x)", xlabel = "x/L"))
+```
+
+As initial condition we use 
+
+$$
+\psi_0 = \sqrt{2} \sin(\pi x)
+$$
+
+```{julia}
+Ψ₀ = sqrt(2.) * sin.(π*x)
+
+lines(x, Ψ₀; axis = (;ylabel = L"\psi_0(x)", xlabel = L"x/L"))
+```
+
+which is normalized to 1
+
+$$
+\int_0^1 |\psi_0(x)|^2 \mathrm{d}x = 1
+$$
+
+as can be confirmed numerically
+
+```{julia}
+sum(Ψ₀.^2 * dx)
+```
+
+```{julia}
+Ψ = zeros(ComplexF64, nt, nx)
+Ψ[1,:] .= Ψ₀
+
+function evolve!(psi)
+    for t in 1:(nt-1)
+        for i in 2:(nx-1)
+            psi[t+1, i] = psi[t, i] + 
+                im/2 * dt/dx^2 * (psi[t, i+1] - 2*psi[t, i] + psi[t, i-1]) - 
+                im*dt*V[i]*psi[t, i]
+        end
+        
+        normal = sum(abs.(psi[t+1,:]).^2)*dx
+        for i in 1:(nx-1)
+            psi[t+1,i] = psi[t+1,i]/normal
+        end
+    end
+end
+
+evolve!(Ψ)
+```
+
+```{julia}
+f,a,p = lines(x, abs2.(Ψ[1,:]); 
+            label = L"t = 0", 
+            axis = (;xlabel = L"x",
+                     ylabel = L"\Psi(5000, x)"))
+
+lines!(a, x, abs2.(Ψ[5000,:]); label = L"t = 5000")
+axislegend(a)
+f
+```
+
+## Solve using eigenstate evolution
+
+The TDSE can also be solved using the eigenstate evolution.
+Here we first solve the time-independent Schrödinger equation (TISE),
+
+$$
+-\frac{\hbar^2}{2m} \frac{\partial^2 \psi(x)}{\partial x^2} + V(x) \psi(x) = E \psi(x)
+$$
+
+
+to obtain the eigenstates $\psi_j(x)$ and their energy levels $E_j$.
+
+Then we can express the time-dependent solutions of the TDSE as
+
+$$
+\psi(x, t) = \sum_{j=0}^\infty a_j \psi_j(x) \exp(-i E_j t)
+$$
+
+where the $a_j$ are obtained from the initial condition $\psi_0(x)$ through
+
+$$
+a_j = \int_{-\infty}^{\infty} \psi_0(x) \psi_j^*(x) \mathrm{d}x
+$$
+
+
+
+To solve the TISE numerically, we can discretize the space and convert the differential equation into a matrix equation.
+
+- Divide the spatial domain into $N$ points with spacing $\Delta x$. Let $x_i = x_0 + i\Delta x$ for $i = 0, 1, 2, \ldots, N-1$.
+
+- Approximate the second derivative using the central difference method:
+   $$ 
+   \frac{d^2 \psi}{dx^2} \bigg|_{x=x_i} \approx \frac{\psi(x_{i+1}) - 2\psi(x_i) + \psi(x_{i-1})}{(\Delta x)^2} 
+   $$
+
+
+We substitute this finite difference approximation into the Schrödinger equation
+
+$$
+ -\frac{\hbar^2}{2m} \frac{\psi(x_{i+1}) - 2\psi(x_i) + \psi(x_{i-1})}{(\Delta x)^2} + V(x_i) \psi(x_i) = E \psi(x_i) 
+$$
+
+and rearrange terms
+
+$$ 
+-\frac{\hbar^2}{2m (\Delta x)^2} \psi(x_{i+1}) + \left( \frac{\hbar^2}{m (\Delta x)^2} + V(x_i) \right) \psi(x_i) - \frac{\hbar^2}{2m (\Delta x)^2} \psi(x_{i-1}) = E \psi(x_i) 
+$$
+
+
+This can be written as a matrix equation $H \psi = E \psi$, where $H$ is a tridiagonal matrix with the following elements:
+
+- The diagonal elements
+  $$ 
+  H_{ii} = \frac{\hbar^2}{m (\Delta x)^2} + V(x_i) 
+  $$
+
+- The off-diagonal elements
+  $$ 
+  H_{i, i+1} = H_{i+1, i} = -\frac{\hbar^2}{2m (\Delta x)^2} 
+  $$
+
+
+For an $N$-point discretization, the Hamiltonian matrix $H$ in tridiagonal form looks like this:
+
+$$
+H = \begin{bmatrix}
+a_1 & b & 0 & 0 & \cdots & 0 & 0 \\
+b & a_2 & b & 0 & \cdots & 0 & 0 \\
+0 & b & a_3 & b & \cdots & 0 & 0 \\
+0 & 0 & b & a_4 & \cdots & 0 & 0 \\
+\vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+0 & 0 & 0 & 0 & \cdots & a_{N-2} & b \\
+0 & 0 & 0 & 0 & \cdots & b & a_{N-1}
+\end{bmatrix}
+$$
+
+where:
+- $a_i = \frac{\hbar^2}{m (\Delta x)^2} + V(x_i)$ (diagonal elements),
+- $b = -\frac{\hbar^2}{2m (\Delta x)^2}$ (off-diagonal elements).
+
+
+
+```{julia}
+#using LinearAlgebra
+
+#eigen(SymTridiagonal(d, e))
+```
+
+## References
+
+https://github.com/lukepolson/youtube_channel/blob/main/Python%20Metaphysics%20Series/vid17.ipynb

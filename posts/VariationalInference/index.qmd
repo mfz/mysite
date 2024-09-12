@@ -1,0 +1,94 @@
+---
+title: "Variational Inference"
+description: "VI as an approximate method for Bayesian inference"
+jupyter: julia-1.10
+categories: julia, Bayes
+draft: true
+---
+
+Suppose we have a Bayesian model with a set of parameters and latent variables, 
+denoted as $\mathbf{Z}$. Our goal is to infer the conditional distribution 
+$p(\mathrm{Z}|\mathrm{X})$, where $\mathrm{X}$ denotes the data.
+
+For many models it is infeasible to compute $p(\mathbf{Z}|\mathbf{X})$ analytically. 
+One then has to resort to approximation schemes like MCMC or variational inference (VI).
+
+The basic idea of VI is to **reformulate the statistical inference problem 
+as an optimization problem**. Therefore, variational inference can often give the 
+speed advantages of MAP estimation, but the statistical advantages of the Bayesian 
+approach.
+
+
+### Kullback-Leibler divergence
+
+Let's assume a system can be described by a probability density function $p(\mathbf{X})$.
+We expect to observe those $\mathbf{X}$ that are most likely. If we observe an unlikely $\mathbf{X}$, we will
+be surprised. We can use $-\log p(\mathbf{X})$ as a quantitative measure of this surprise.
+
+The average surprise, or uncertainty, when using a model $p(\mathbf{X})$ is the so-called entropy
+
+$$
+H[p] =  - \int p(x) \log p(x) \mathrm{d}x
+$$
+
+
+The cross entropy is the average surprise or uncertainty when using a different model / probability distribution $q(\mathbf{X})$ 
+than $p(\mathbf{X})$ to describe the system. 
+
+$$
+H_q[p] = - \int p(x) \log q(x) \mathrm{d}x
+$$
+
+The Kullback-Leibler divergence (not a distance as it is not symmetric!)
+is the increase in surprise/uncertainty when assuming model $q(\mathbf{X})$ while model 
+$p(\mathbf{X})$ is the correct one; in other words, KL divergence tells how much the model 
+represented by $q(\mathbf{X})$ still needs to learn.
+
+ $$
+ KL(p||q) = H_q(p) - H(p) = (-p \log q) - (-p \log p) = p \log \frac{p}{q}
+ $$
+
+ $$
+ KL(p||q) = \int p(x) \log \frac{p(x)}{q(x)} \mathrm{d}x
+ $$
+
+Often the Kullback-Leibler divergence is used to approximate a complicated (or unknown) probability density
+$p(x)$ by a simpler one $q(x)$. 
+$KL(p||q)$ contains a term $p(x) \log q(x)$. For $q(x) \to 0$, $\log q(x) \to -\infty$. To avoid that
+$KL(p||q)$ diverges, we require $p(x) = 0$ whereever $q(x) = 0$. That is, the approximation 
+$q(x)$ can only be $0$ where $p(x) = 0$, such that we require $q(x)>0$ whereever $p(x) > 0$.
+If $p(x)$ is multi-modal, $q(x)$ needs to cover all the modes. It might therefore also cover regions of low probability,
+which could result in a poor model fit.
+
+For the reverse Kullback-Leibler divergence $KL(q||p)$, the roles of $q$ and $p$ are switched.
+To avoid divergence of the reverse KL, we require $q(x) = 0$ whereever $p(x) = 0$. In that case,
+if $p(x)$ is multi-modal and the modes are isolated by forbidden regions, $q(x)$ can only cover a single mode. 
+
+
+### Variational inference 
+
+In VI, we approximate $p(\mathbf{Z}|\mathbf{X})$ by a parameterized distribution $q_\lambda(\mathbf{Z})$,
+where $\lambda$ denotes the set of parameters. 
+$q_\lambda(\mathbf{Z})$ is chosed to **minimize the reverse
+Kullback-Leibler divergence** (KL)
+
+$$
+KL(q_\lambda(\mathbf{Z})||p(\mathbf{Z}|\mathbf{X})) = \int  q_\lambda(\mathbf{Z}) 
+   \log \left( \frac{p(\mathbf{Z}|\mathbf{X})}{q_\lambda(\mathbf{Z}) } \right) \mathrm{d}\mathbf{Z}
+$$
+
+The reverse KL is chosen to make the computation tractable. It implies that 
+$q_\lambda(\mathbf{Z}) = 0$ for $p(\mathbf{Z}|\mathbf{X}) = 0$, as otherwise the reverse KL
+would diverge. For a multi-modal $p(\mathbf{Z}|\mathbf{X})$, VI will, therefore, only cover a single mode.
+
+
+
+
+### Mean field approximation
+
+### Black-box variational inference
+
+### References
+
+- Bishop C.(2006), Pattern Recognition and Machine Learning, Chapter 10
+- Murphy K.(2012), Machine learning - a probabilistic perspective, Chapter 21

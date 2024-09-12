@@ -1,0 +1,68 @@
+---
+title: "Symbolics.jl"
+description: "Symbolic computatiosn in Julia"
+jupyter: julia-1.10
+draft: true
+---
+
+```{julia}
+using Symbolics
+using Latexify
+```
+
+
+```{julia}
+@variables x
+```
+
+```{julia}
+y = x^2 + sin(x)
+z = y^2
+```
+
+
+```{julia}
+@variables L d ΔL Δd
+
+f = (L^2 - d^2)/(4L)
+
+substitute(f, Dict(L => 98.47, d => 17.53))
+
+```
+
+```{julia}
+
+dL = Differential(L)
+dd = Differential(d)
+
+expand_derivatives(dL(f))
+expand_derivatives(dd(f))
+
+Δf = sqrt(dL(f)^2 * ΔL^2 + dd(f)^2 * Δd^2)
+
+substitute(expand_derivatives(Δf), Dict(L => 98.47, d => 17.53, ΔL => 0.08, Δd => 0.08))
+```
+
+
+```{julia}
+@variables D f Δf ΔD
+
+α = atan(D/2f)
+
+df = Differential(f)
+dD = Differential(D)
+
+Δα = sqrt(df(α)^2 * Δf^2 + dD(α)^2 * ΔD^2)
+
+substitute(expand_derivatives(Δα), Dict(D => 0.47, Δf => 1, f => 50, ΔD => 0.05))
+
+```
+
+```{julia}
+substitute(α, Dict(D => 0.47, Δf => 1, f => 50, ΔD => 0.05))
+```
+
+```{julia}
+
+
+```
