@@ -2,7 +2,11 @@
 title: "Bayesian Latent Class Analysis"
 description: "Latent class analysis using Gibbs sampling and Expectation-Maximization"
 jupyter: julia-1.10
-categories: julia, Bayes, MCMC, EM
+categories: 
+    - julia
+    - Bayes
+    - MCMC
+    - EM
 draft: false
 ---
 

@@ -4,7 +4,7 @@
     "href": "posts.html",
     "title": "My Notes",
     "section": "",
-    "text": "Tensor notation\n\n\nIntroduction to tensor, index, or Einstein notation\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPendulum\n\n\n\njulia, physics\n\n\n\nSimulating a pendulum in Julia, analytically, numerically, and symbolically\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nBayesian Latent Class Analysis\n\n\n\njulia, Bayes, MCMC, EM\n\n\n\nLatent class analysis using Gibbs sampling and Expectation-Maximization\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "Tensor notation\n\n\n\nphysics\n\n\n\nIntroduction to tensor, index, or Einstein notation\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPendulum\n\n\n\njulia\n\n\nphysics\n\n\n\nSimulating a pendulum in Julia, analytically, numerically, and symbolically\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nBayesian Latent Class Analysis\n\n\n\njulia\n\n\nBayes\n\n\nMCMC\n\n\nEM\n\n\n\nLatent class analysis using Gibbs sampling and Expectation-Maximization\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "index.html",

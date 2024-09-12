@@ -1,6 +1,8 @@
 ---
 title: "Tensor notation"
 description: "Introduction to tensor, index, or Einstein notation"
+categories:
+    - physics
 image: Einstein.jpeg
 draft: false
 ---

@@ -2,7 +2,9 @@
 title: "Pendulum"
 description: "Simulating a pendulum in Julia, analytically, numerically, and symbolically"
 jupyter: julia-1.10
-categories: julia, physics
+categories: 
+    - julia
+    - physics
 draft: false
 ---
 

@@ -273,7 +273,7 @@ B_i(k) = \frac{\sum_{t=1}^T \gamma_t(i) \cdot 1(O_t = k)}{\sum_{t=1}^T \gamma_t(
 <section id="toy-example-in-julia" class="level2">
 <h2 class="anchored" data-anchor-id="toy-example-in-julia">Toy Example in Julia</h2>
 <p>Here’s a simple implementation of the EM algorithm for HMMs in Julia using a toy example:</p>
-<div id="f43dcd4e" class="cell" data-execution_count="1">
+<div id="aac3671b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Random</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -373,11 +373,11 @@ B_i(k) = \frac{\sum_{t=1}^T \gamma_t(i) \cdot 1(O_t = k)}{\sum_{t=1}^T \gamma_t(
 <span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(B)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Learned initial state distribution π:
-[0.0031051195419915414, 0.9968948804580084]
+[0.9999994695786135, 5.304213864628989e-7]
 Learned transition matrix A:
-[1.4524143399782858 0.4214491189215544; 1.3805884426635706 0.7637550927200469]
+[0.8816965794186353 1.289328620018658; 0.7525580284173626 1.1013945598621422]
 Learned emission matrix B:
-[0.3502138515490429 0.4738845860572518 0.17590156239370525; 0.0027219495113472527 0.7656292195601673 0.23164883092848543]</code></pre>
+[0.009048443462753061 0.9865595295425229 0.004392026994723988; 0.4108423094128966 0.17317392215962166 0.41598376842748175]</code></pre>
 </div>
 </div>
 <p>The code does not work correctly! The transition matrix is not properly normalized!</p>

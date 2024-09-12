@@ -198,11 +198,11 @@ window.Quarto = {
 
 
 
-<div id="36a90b15" class="cell" data-execution_count="1">
+<div id="73c80a61" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Symbolics</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Latexify</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="290b3933" class="cell" data-execution_count="2">
+<div id="483aaf6a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@variables</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="3">
 <p><span class="math display">\[ \begin{equation}
@@ -215,7 +215,7 @@ x \\
 \]</span></p>
 </div>
 </div>
-<div id="c7a277af" class="cell" data-execution_count="3">
+<div id="d013339c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fu">sin</span>(x)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> y<span class="op">^</span><span class="fl">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="4">
@@ -225,7 +225,7 @@ x \\
 \]</span></p>
 </div>
 </div>
-<div id="4d34a445" class="cell" data-execution_count="4">
+<div id="5f01e287" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@variables</span> L d ΔL Δd</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> (L<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> d<span class="op">^</span><span class="fl">2</span>)<span class="op">/</span>(<span class="fl">4</span>L)</span>
@@ -238,7 +238,7 @@ x \\
 \]</span></p>
 </div>
 </div>
-<div id="6529b790" class="cell" data-execution_count="5">
+<div id="d69cd4b8" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dL <span class="op">=</span> <span class="fu">Differential</span>(L)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dd <span class="op">=</span> <span class="fu">Differential</span>(d)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -255,7 +255,7 @@ x \\
 \]</span></p>
 </div>
 </div>
-<div id="ee9d16e5" class="cell" data-execution_count="6">
+<div id="44763fb0" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@variables</span> D f Δf ΔD</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>α <span class="op">=</span> <span class="fu">atan</span>(D<span class="op">/</span><span class="fl">2</span>f)</span>
@@ -273,7 +273,7 @@ x \\
 \]</span></p>
 </div>
 </div>
-<div id="ecd5e89b" class="cell" data-execution_count="7">
+<div id="30fff9ea" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">substitute</span>(α, <span class="fu">Dict</span>(D <span class="op">=&gt;</span> <span class="fl">0.47</span>, Δf <span class="op">=&gt;</span> <span class="fl">1</span>, f <span class="op">=&gt;</span> <span class="fl">50</span>, ΔD <span class="op">=&gt;</span> <span class="fl">0.05</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="8">
 <p><span class="math display">\[ \begin{equation}

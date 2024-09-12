@@ -231,7 +231,7 @@ i\hbar \frac{\partial \psi(x,t)}{\partial t} = -\frac{\hbar^2}{2m} \frac{\partia
 <p><span class="math display">\[
 V(x) = - 10^4 \exp\left(-\frac{(x - L/2)^2}{2(L/20)^2} \right)
 \]</span></p>
-<div id="7e36a99b" class="cell" data-execution_count="1">
+<div id="e09ac868" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LaTeXStrings</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -250,7 +250,7 @@ V(x) = - 10^4 \exp\left(-\frac{(x - L/2)^2}{2(L/20)^2} \right)
 <pre><code>┌ Warning: Found `resolution` in the theme when creating a `Scene`. The `resolution` keyword for `Scene`s and `Figure`s has been deprecated. Use `Figure(; size = ...` or `Scene(; size = ...)` instead, which better reflects that this is a unitless size and not a pixel resolution. The key could also come from `set_theme!` calls or related theming functions.
 └ @ Makie ~/.julia/packages/Makie/rEu75/src/scenes.jl:227</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="16">
+<div class="cell-output cell-output-display" data-execution_count="2">
 <div>
 <figure class="figure">
 <p><img src="index_files/figure-html/cell-2-output-2.svg" class="img-fluid figure-img"></p>
@@ -262,7 +262,7 @@ V(x) = - 10^4 \exp\left(-\frac{(x - L/2)^2}{2(L/20)^2} \right)
 <p><span class="math display">\[
 \psi_0 = \sqrt{2} \sin(\pi x)
 \]</span></p>
-<div id="3935afe8" class="cell" data-execution_count="2">
+<div id="84b84940" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>Ψ₀ <span class="op">=</span> <span class="fu">sqrt</span>(<span class="fl">2</span>.) <span class="op">*</span> <span class="fu">sin</span>.(<span class="cn">π</span><span class="op">*</span>x)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(x, Ψ₀; axis <span class="op">=</span> (;ylabel <span class="op">=</span> L<span class="st">"\psi_0(x)"</span>, xlabel <span class="op">=</span> L<span class="st">"x/L"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -270,7 +270,7 @@ V(x) = - 10^4 \exp\left(-\frac{(x - L/2)^2}{2(L/20)^2} \right)
 <pre><code>┌ Warning: Found `resolution` in the theme when creating a `Scene`. The `resolution` keyword for `Scene`s and `Figure`s has been deprecated. Use `Figure(; size = ...` or `Scene(; size = ...)` instead, which better reflects that this is a unitless size and not a pixel resolution. The key could also come from `set_theme!` calls or related theming functions.
 └ @ Makie ~/.julia/packages/Makie/rEu75/src/scenes.jl:227</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="17">
+<div class="cell-output cell-output-display" data-execution_count="3">
 <div>
 <figure class="figure">
 <p><img src="index_files/figure-html/cell-3-output-2.svg" class="img-fluid figure-img"></p>
@@ -283,13 +283,13 @@ V(x) = - 10^4 \exp\left(-\frac{(x - L/2)^2}{2(L/20)^2} \right)
 \int_0^1 |\psi_0(x)|^2 \mathrm{d}x = 1
 \]</span></p>
 <p>as can be confirmed numerically</p>
-<div id="f9ee83d9" class="cell" data-execution_count="3">
+<div id="cdc015bc" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(Ψ₀<span class="op">.^</span><span class="fl">2</span> <span class="op">*</span> dx)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="18">
+<div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>1.0000000000000002</code></pre>
 </div>
 </div>
-<div id="bf55337e" class="cell" data-execution_count="4">
+<div id="f15aba31" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>Ψ <span class="op">=</span> <span class="fu">zeros</span>(<span class="dt">ComplexF64</span>, nt, nx)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>Ψ[<span class="fl">1</span>,<span class="op">:</span>] <span class="op">.=</span> Ψ₀</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -310,7 +310,7 @@ V(x) = - 10^4 \exp\left(-\frac{(x - L/2)^2}{2(L/20)^2} \right)
 <span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="fu">evolve!</span>(Ψ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="7d382af6" class="cell" data-execution_count="5">
+<div id="e7a9fdc7" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>f,a,p <span class="op">=</span> <span class="fu">lines</span>(x, <span class="fu">abs2</span>.(Ψ[<span class="fl">1</span>,<span class="op">:</span>]); </span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>            label <span class="op">=</span> L<span class="st">"t = 0"</span>, </span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>            axis <span class="op">=</span> (;xlabel <span class="op">=</span> L<span class="st">"x"</span>,</span>
@@ -323,7 +323,7 @@ V(x) = - 10^4 \exp\left(-\frac{(x - L/2)^2}{2(L/20)^2} \right)
 <pre><code>┌ Warning: Found `resolution` in the theme when creating a `Scene`. The `resolution` keyword for `Scene`s and `Figure`s has been deprecated. Use `Figure(; size = ...` or `Scene(; size = ...)` instead, which better reflects that this is a unitless size and not a pixel resolution. The key could also come from `set_theme!` calls or related theming functions.
 └ @ Makie ~/.julia/packages/Makie/rEu75/src/scenes.jl:227</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="20">
+<div class="cell-output cell-output-display" data-execution_count="6">
 <div>
 <figure class="figure">
 <p><img src="index_files/figure-html/cell-6-output-2.svg" class="img-fluid figure-img"></p>
@@ -384,7 +384,7 @@ b &amp; a_2 &amp; b &amp; 0 &amp; \cdots &amp; 0 &amp; 0 \\
 \end{bmatrix}
 \]</span></p>
 <p>where: - <span class="math inline">\(a_i = \frac{\hbar^2}{m (\Delta x)^2} + V(x_i)\)</span> (diagonal elements), - <span class="math inline">\(b = -\frac{\hbar^2}{2m (\Delta x)^2}\)</span> (off-diagonal elements).</p>
-<div id="771f7718" class="cell" data-execution_count="6">
+<div id="5452cb47" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#using LinearAlgebra</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#eigen(SymTridiagonal(d, e))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>

@@ -218,36 +218,31 @@ window.Quarto = {
 <section id="coin-example" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="coin-example"><span class="header-section-number">1</span> Coin example</h2>
 <p>Let’s flip a biased coin a hundred times.</p>
-<div id="baa45a13" class="cell" data-execution_count="1">
+<div id="4afbb7d2" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Turing</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>coin_flips <span class="op">=</span> <span class="fu">rand</span>(<span class="fu">Bernoulli</span>(<span class="fl">0.7</span>), <span class="fl">100</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>[ Info: Precompiling IntervalArithmeticDiffRulesExt [86439bda-9ede-5c22-99a0-f82df582fb22]
-[ Info: Precompiling IntervalArithmeticForwardDiffExt [ba47a815-ec9a-57c1-b718-e4e972ac9261]
-[ Info: Precompiling SciMLBaseMakieExt [565f26a4-c902-5eae-92ad-e10714a9d9de]</code></pre>
-</div>
 </div>
 <p>In order to do inference, we need to specify a model.</p>
 <p><span class="math display">\[ p \sim Beta(1,1) \]</span></p>
 <p><span class="math display">\[ coin flip \sim Bernoulli(p) \]</span></p>
-<div id="6f216540" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@model</span> <span class="kw">function</span> <span class="fu">coin</span>(data)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  p <span class="op">~</span>&nbsp;<span class="fu">Beta</span>(<span class="fl">1</span>,<span class="fl">1</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> i <span class="kw">in</span> <span class="fu">eachindex</span>(data) </span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    data[i] <span class="op">~</span>&nbsp;<span class="fu">Bernoulli</span>(p)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="f3d7d3ce" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@model</span> <span class="kw">function</span> <span class="fu">coin</span>(data)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  p <span class="op">~</span>&nbsp;<span class="fu">Beta</span>(<span class="fl">1</span>,<span class="fl">1</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> i <span class="kw">in</span> <span class="fu">eachindex</span>(data) </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    data[i] <span class="op">~</span>&nbsp;<span class="fu">Bernoulli</span>(p)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>coin (generic function with 2 methods)</code></pre>
 </div>
 </div>
 <section id="sample-from-prior" class="level3" data-number="1.1">
 <h3 data-number="1.1" class="anchored" data-anchor-id="sample-from-prior"><span class="header-section-number">1.1</span> Sample from prior</h3>
-<div id="b1d3e2c9" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>prior <span class="op">=</span> <span class="fu">sample</span>(<span class="fu">coin</span>(coin_flips), <span class="fu">Prior</span>(), <span class="fl">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="78745cff" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>prior <span class="op">=</span> <span class="fu">sample</span>(<span class="fu">coin</span>(coin_flips), <span class="fu">Prior</span>(), <span class="fl">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Sampling:   1%|▍                                        |  ETA: 0:00:11Sampling: 100%|█████████████████████████████████████████| Time: 0:00:00</code></pre>
+<pre><code>Sampling:   5%|██                                       |  ETA: 0:00:02Sampling: 100%|█████████████████████████████████████████| Time: 0:00:00</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div class="ansi-escaped-output">
@@ -255,38 +250,38 @@ window.Quarto = {
 Iterations        = 1:1:1000
 Number of chains  = 1
 Samples per chain = 1000
-Wall duration     = 1.24 seconds
-Compute duration  = 1.24 seconds
+Wall duration     = 1.23 seconds
+Compute duration  = 1.23 seconds
 parameters        = p
 internals         = lp
 Summary Statistics
  <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold"> ess_bulk </span> <span class="ansi-bold"> ess_tail </span> <span class="ansi-bold">    rhat </span> <span class="ansi-bold"> e</span> ⋯
  <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  </span> ⋯
-           p    0.4915    0.2880    0.0099   885.4803   872.9464    0.9998     ⋯
+           p    0.4780    0.2930    0.0097   925.5270   740.7721    0.9994     ⋯
 <span class="ansi-cyan-fg">                                                                1 column omitted</span>
 Quantiles
  <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    2.5% </span> <span class="ansi-bold">   25.0% </span> <span class="ansi-bold">   50.0% </span> <span class="ansi-bold">   75.0% </span> <span class="ansi-bold">   97.5% </span>
  <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span>
-           p    0.0396    0.2375    0.4890    0.7304    0.9800
+           p    0.0203    0.2152    0.4579    0.7285    0.9712
 </pre>
 </div>
 </div>
 </div>
-<div id="dd01678c" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarystats</span>(prior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="a4a0ad48" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarystats</span>(prior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div class="ansi-escaped-output">
 <pre>Summary Statistics
  <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold"> ess_bulk </span> <span class="ansi-bold"> ess_tail </span> <span class="ansi-bold">    rhat </span> <span class="ansi-bold"> e</span> ⋯
  <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  </span> ⋯
-           p    0.4915    0.2880    0.0099   885.4803   872.9464    0.9998     ⋯
+           p    0.4780    0.2930    0.0097   925.5270   740.7721    0.9994     ⋯
 <span class="ansi-cyan-fg">                                                                1 column omitted</span>
 </pre>
 </div>
 </div>
 </div>
-<div id="09c32f0b" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(prior) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="a56b2102" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(prior) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div>
 <div><div style="float: left;"><span>1000×4 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">975 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
@@ -312,91 +307,91 @@ Quantiles
 <td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.626481</td>
+<td style="text-align: right;">0.0974593</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.980008</td>
+<td style="text-align: right;">0.733201</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.609349</td>
+<td style="text-align: right;">0.209938</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.414771</td>
+<td style="text-align: right;">0.9691</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.497911</td>
+<td style="text-align: right;">0.445236</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
 <td style="text-align: right;">6</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.0157188</td>
+<td style="text-align: right;">0.0753569</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">7</td>
 <td style="text-align: right;">7</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.930695</td>
+<td style="text-align: right;">0.0909741</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">8</td>
 <td style="text-align: right;">8</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.415633</td>
+<td style="text-align: right;">0.663131</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">9</td>
 <td style="text-align: right;">9</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.229793</td>
+<td style="text-align: right;">0.447975</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">10</td>
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.0160875</td>
+<td style="text-align: right;">0.902241</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">11</td>
 <td style="text-align: right;">11</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.643756</td>
+<td style="text-align: right;">0.140264</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">12</td>
 <td style="text-align: right;">12</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.240649</td>
+<td style="text-align: right;">0.702918</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">13</td>
 <td style="text-align: right;">13</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.0925795</td>
+<td style="text-align: right;">0.698591</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="even">
@@ -410,84 +405,84 @@ Quantiles
 <td class="rowNumber" style="text-align: right; font-weight: bold;">989</td>
 <td style="text-align: right;">989</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.089451</td>
+<td style="text-align: right;">0.525463</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">990</td>
 <td style="text-align: right;">990</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.333495</td>
+<td style="text-align: right;">0.0472247</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">991</td>
 <td style="text-align: right;">991</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.793846</td>
+<td style="text-align: right;">0.253573</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">992</td>
 <td style="text-align: right;">992</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.711229</td>
+<td style="text-align: right;">0.214683</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">993</td>
 <td style="text-align: right;">993</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.13608</td>
+<td style="text-align: right;">0.101427</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">994</td>
 <td style="text-align: right;">994</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.087633</td>
+<td style="text-align: right;">0.517077</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">995</td>
 <td style="text-align: right;">995</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.0316221</td>
+<td style="text-align: right;">0.814655</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">996</td>
 <td style="text-align: right;">996</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.198541</td>
+<td style="text-align: right;">0.417887</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">997</td>
 <td style="text-align: right;">997</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.421604</td>
+<td style="text-align: right;">0.915762</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">998</td>
 <td style="text-align: right;">998</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.323067</td>
+<td style="text-align: right;">0.684461</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">999</td>
 <td style="text-align: right;">999</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.490487</td>
+<td style="text-align: right;">0.851088</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">1000</td>
 <td style="text-align: right;">1000</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.242713</td>
+<td style="text-align: right;">0.394471</td>
 <td style="text-align: right;">0.0</td>
 </tr>
 </tbody>
@@ -499,11 +494,11 @@ Quantiles
 </section>
 <section id="sample-from-posterior" class="level3" data-number="1.2">
 <h3 data-number="1.2" class="anchored" data-anchor-id="sample-from-posterior"><span class="header-section-number">1.2</span> Sample from posterior</h3>
-<div id="1a79d510" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>posterior <span class="op">=</span> <span class="fu">sample</span>(<span class="fu">coin</span>(coin_flips), <span class="fu">NUTS</span>(), <span class="fl">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="14ce80e0" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>posterior <span class="op">=</span> <span class="fu">sample</span>(<span class="fu">coin</span>(coin_flips), <span class="fu">NUTS</span>(), <span class="fl">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>┌ Info: Found initial step size
-└   ϵ = 0.8</code></pre>
+└   ϵ = 0.6000000000000001</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div class="ansi-escaped-output">
@@ -511,38 +506,38 @@ Quantiles
 Iterations        = 501:1:1500
 Number of chains  = 1
 Samples per chain = 1000
-Wall duration     = 2.46 seconds
-Compute duration  = 2.46 seconds
+Wall duration     = 2.42 seconds
+Compute duration  = 2.42 seconds
 parameters        = p
 internals         = lp, n_steps, is_accept, acceptance_rate, log_density, hamiltonian_energy, hamiltonian_energy_error, max_hamiltonian_energy_error, tree_depth, numerical_error, step_size, nom_step_size
 Summary Statistics
  <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold"> ess_bulk </span> <span class="ansi-bold"> ess_tail </span> <span class="ansi-bold">    rhat </span> <span class="ansi-bold"> e</span> ⋯
  <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  </span> ⋯
-           p    0.7054    0.0446    0.0016   787.3567   605.1319    1.0000     ⋯
+           p    0.6983    0.0455    0.0021   475.1441   662.1290    0.9999     ⋯
 <span class="ansi-cyan-fg">                                                                1 column omitted</span>
 Quantiles
  <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    2.5% </span> <span class="ansi-bold">   25.0% </span> <span class="ansi-bold">   50.0% </span> <span class="ansi-bold">   75.0% </span> <span class="ansi-bold">   97.5% </span>
  <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span>
-           p    0.6194    0.6719    0.7087    0.7373    0.7889
+           p    0.6055    0.6671    0.7029    0.7307    0.7812
 </pre>
 </div>
 </div>
 </div>
-<div id="6ccc7776" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarystats</span>(prior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="4f8c4bc3" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarystats</span>(prior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div class="ansi-escaped-output">
 <pre>Summary Statistics
  <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold"> ess_bulk </span> <span class="ansi-bold"> ess_tail </span> <span class="ansi-bold">    rhat </span> <span class="ansi-bold"> e</span> ⋯
  <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">  </span> ⋯
-           p    0.4915    0.2880    0.0099   885.4803   872.9464    0.9998     ⋯
+           p    0.4780    0.2930    0.0097   925.5270   740.7721    0.9994     ⋯
 <span class="ansi-cyan-fg">                                                                1 column omitted</span>
 </pre>
 </div>
 </div>
 </div>
-<div id="c2a468f5" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(posterior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="18b65e3b" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(posterior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div>
 <div><div style="float: left;"><span>1000×15 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">975 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
@@ -590,235 +585,235 @@ Quantiles
 <td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
 <td style="text-align: right;">501</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.661758</td>
-<td style="text-align: right;">-62.2454</td>
+<td style="text-align: right;">0.716273</td>
+<td style="text-align: right;">-62.7443</td>
 <td style="text-align: right;">3.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.613569</td>
-<td style="text-align: right;">-62.2454</td>
-<td style="text-align: right;">62.6645</td>
-<td style="text-align: right;">-0.129849</td>
-<td style="text-align: right;">0.887387</td>
+<td style="text-align: right;">0.836052</td>
+<td style="text-align: right;">-62.7443</td>
+<td style="text-align: right;">63.0414</td>
+<td style="text-align: right;">-0.061806</td>
+<td style="text-align: right;">0.357343</td>
 <td style="text-align: right;">2.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
 <td style="text-align: right;">502</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.641578</td>
-<td style="text-align: right;">-62.7367</td>
+<td style="text-align: right;">0.686689</td>
+<td style="text-align: right;">-62.6644</td>
+<td style="text-align: right;">3.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.6856</td>
-<td style="text-align: right;">-62.7367</td>
-<td style="text-align: right;">63.189</td>
-<td style="text-align: right;">0.377461</td>
-<td style="text-align: right;">0.377461</td>
-<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.964163</td>
+<td style="text-align: right;">-62.6644</td>
+<td style="text-align: right;">62.7504</td>
+<td style="text-align: right;">-0.0530507</td>
+<td style="text-align: right;">0.0659281</td>
+<td style="text-align: right;">2.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
 <td style="text-align: right;">503</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.709041</td>
-<td style="text-align: right;">-61.7938</td>
+<td style="text-align: right;">0.686689</td>
+<td style="text-align: right;">-62.6644</td>
+<td style="text-align: right;">3.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">-61.7938</td>
-<td style="text-align: right;">62.1042</td>
-<td style="text-align: right;">-0.693209</td>
-<td style="text-align: right;">-0.693209</td>
-<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.519017</td>
+<td style="text-align: right;">-62.6644</td>
+<td style="text-align: right;">63.2651</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">0.869281</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
 <td style="text-align: right;">504</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.709041</td>
-<td style="text-align: right;">-61.7938</td>
+<td style="text-align: right;">0.717274</td>
+<td style="text-align: right;">-62.7547</td>
+<td style="text-align: right;">3.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.526182</td>
-<td style="text-align: right;">-61.7938</td>
-<td style="text-align: right;">62.1708</td>
+<td style="text-align: right;">0.900776</td>
+<td style="text-align: right;">-62.7547</td>
+<td style="text-align: right;">62.8244</td>
+<td style="text-align: right;">0.0604982</td>
+<td style="text-align: right;">0.137959</td>
+<td style="text-align: right;">2.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.642109</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
 <td style="text-align: right;">505</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.755824</td>
-<td style="text-align: right;">-62.4521</td>
+<td style="text-align: right;">0.717274</td>
+<td style="text-align: right;">-62.7547</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.64429</td>
-<td style="text-align: right;">-62.4521</td>
-<td style="text-align: right;">62.4891</td>
-<td style="text-align: right;">0.439606</td>
-<td style="text-align: right;">0.439606</td>
+<td style="text-align: right;">0.541325</td>
+<td style="text-align: right;">-62.7547</td>
+<td style="text-align: right;">63.3641</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.613735</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
 <td style="text-align: right;">506</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.727758</td>
-<td style="text-align: right;">-61.9126</td>
+<td style="text-align: right;">0.716458</td>
+<td style="text-align: right;">-62.7462</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">-61.9126</td>
-<td style="text-align: right;">62.2398</td>
-<td style="text-align: right;">-0.350576</td>
-<td style="text-align: right;">-0.350576</td>
+<td style="text-align: right;">-62.7462</td>
+<td style="text-align: right;">62.8094</td>
+<td style="text-align: right;">-0.00481549</td>
+<td style="text-align: right;">-0.00481549</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">7</td>
 <td style="text-align: right;">507</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.723545</td>
-<td style="text-align: right;">-61.8699</td>
+<td style="text-align: right;">0.743146</td>
+<td style="text-align: right;">-63.2139</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">-61.8699</td>
-<td style="text-align: right;">61.9445</td>
-<td style="text-align: right;">-0.0287762</td>
-<td style="text-align: right;">-0.0287762</td>
+<td style="text-align: right;">0.772928</td>
+<td style="text-align: right;">-63.2139</td>
+<td style="text-align: right;">63.2875</td>
+<td style="text-align: right;">0.257569</td>
+<td style="text-align: right;">0.257569</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">8</td>
 <td style="text-align: right;">508</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.647271</td>
-<td style="text-align: right;">-62.581</td>
+<td style="text-align: right;">0.754243</td>
+<td style="text-align: right;">-63.5307</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.601097</td>
-<td style="text-align: right;">-62.581</td>
-<td style="text-align: right;">62.5876</td>
-<td style="text-align: right;">0.508999</td>
-<td style="text-align: right;">0.508999</td>
+<td style="text-align: right;">0.847033</td>
+<td style="text-align: right;">-63.5307</td>
+<td style="text-align: right;">63.8521</td>
+<td style="text-align: right;">0.166016</td>
+<td style="text-align: right;">0.166016</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">9</td>
 <td style="text-align: right;">509</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.727068</td>
-<td style="text-align: right;">-61.9049</td>
+<td style="text-align: right;">0.622452</td>
+<td style="text-align: right;">-63.8561</td>
+<td style="text-align: right;">3.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">-61.9049</td>
-<td style="text-align: right;">62.1028</td>
-<td style="text-align: right;">-0.480367</td>
-<td style="text-align: right;">-0.480367</td>
-<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.467573</td>
+<td style="text-align: right;">-63.8561</td>
+<td style="text-align: right;">65.0177</td>
+<td style="text-align: right;">-0.252172</td>
+<td style="text-align: right;">2.27264</td>
+<td style="text-align: right;">2.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">10</td>
 <td style="text-align: right;">510</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.727068</td>
-<td style="text-align: right;">-61.9049</td>
-<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">0.595396</td>
+<td style="text-align: right;">-64.8658</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.916118</td>
-<td style="text-align: right;">-61.9049</td>
-<td style="text-align: right;">62.002</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.223411</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.512129</td>
+<td style="text-align: right;">-64.8658</td>
+<td style="text-align: right;">65.7811</td>
+<td style="text-align: right;">0.669179</td>
+<td style="text-align: right;">0.669179</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">11</td>
 <td style="text-align: right;">511</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.727068</td>
-<td style="text-align: right;">-61.9049</td>
+<td style="text-align: right;">0.59396</td>
+<td style="text-align: right;">-64.9274</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.00218448</td>
-<td style="text-align: right;">-61.9049</td>
-<td style="text-align: right;">64.2827</td>
+<td style="text-align: right;">0.959485</td>
+<td style="text-align: right;">-64.9274</td>
+<td style="text-align: right;">66.3776</td>
+<td style="text-align: right;">0.0413584</td>
+<td style="text-align: right;">0.0413584</td>
+<td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">6.12638</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">12</td>
 <td style="text-align: right;">512</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.677694</td>
-<td style="text-align: right;">-61.9799</td>
-<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">0.644451</td>
+<td style="text-align: right;">-63.2512</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.976749</td>
-<td style="text-align: right;">-61.9799</td>
-<td style="text-align: right;">61.9878</td>
-<td style="text-align: right;">0.0501883</td>
-<td style="text-align: right;">-0.0836575</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">-63.2512</td>
+<td style="text-align: right;">64.4046</td>
+<td style="text-align: right;">-1.09783</td>
+<td style="text-align: right;">-1.09783</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">13</td>
 <td style="text-align: right;">513</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.671429</td>
-<td style="text-align: right;">-62.0711</td>
+<td style="text-align: right;">0.673646</td>
+<td style="text-align: right;">-62.7615</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.934484</td>
-<td style="text-align: right;">-62.0711</td>
-<td style="text-align: right;">62.229</td>
-<td style="text-align: right;">0.0677607</td>
-<td style="text-align: right;">0.0677607</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">-62.7615</td>
+<td style="text-align: right;">63.0591</td>
+<td style="text-align: right;">-0.305747</td>
+<td style="text-align: right;">-0.305747</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="even">
 <td style="text-align: right;">⋮</td>
@@ -842,217 +837,217 @@ Quantiles
 <td class="rowNumber" style="text-align: right; font-weight: bold;">989</td>
 <td style="text-align: right;">1489</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.728076</td>
-<td style="text-align: right;">-61.9162</td>
+<td style="text-align: right;">0.683349</td>
+<td style="text-align: right;">-62.6818</td>
+<td style="text-align: right;">3.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.87971</td>
-<td style="text-align: right;">-61.9162</td>
-<td style="text-align: right;">62.0928</td>
+<td style="text-align: right;">0.931909</td>
+<td style="text-align: right;">-62.6818</td>
+<td style="text-align: right;">62.8588</td>
+<td style="text-align: right;">-0.118328</td>
+<td style="text-align: right;">0.124967</td>
+<td style="text-align: right;">2.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.128163</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">990</td>
 <td style="text-align: right;">1490</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.730009</td>
-<td style="text-align: right;">-61.9393</td>
+<td style="text-align: right;">0.683349</td>
+<td style="text-align: right;">-62.6818</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.984657</td>
-<td style="text-align: right;">-61.9393</td>
-<td style="text-align: right;">62.0281</td>
-<td style="text-align: right;">0.0154615</td>
-<td style="text-align: right;">0.0154615</td>
+<td style="text-align: right;">0.942347</td>
+<td style="text-align: right;">-62.6818</td>
+<td style="text-align: right;">62.751</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0593818</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">991</td>
 <td style="text-align: right;">1491</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.730009</td>
-<td style="text-align: right;">-61.9393</td>
+<td style="text-align: right;">0.677488</td>
+<td style="text-align: right;">-62.7249</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.429056</td>
-<td style="text-align: right;">-61.9393</td>
-<td style="text-align: right;">62.2831</td>
+<td style="text-align: right;">0.974281</td>
+<td style="text-align: right;">-62.7249</td>
+<td style="text-align: right;">62.7517</td>
+<td style="text-align: right;">0.0260556</td>
+<td style="text-align: right;">0.0260556</td>
+<td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.846168</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">992</td>
 <td style="text-align: right;">1492</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.650878</td>
-<td style="text-align: right;">-62.4892</td>
+<td style="text-align: right;">0.696995</td>
+<td style="text-align: right;">-62.6436</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.679472</td>
-<td style="text-align: right;">-62.4892</td>
-<td style="text-align: right;">62.4892</td>
-<td style="text-align: right;">0.38644</td>
-<td style="text-align: right;">0.38644</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">-62.6436</td>
+<td style="text-align: right;">62.6772</td>
+<td style="text-align: right;">-0.048453</td>
+<td style="text-align: right;">-0.048453</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">993</td>
 <td style="text-align: right;">1493</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.68668</td>
-<td style="text-align: right;">-61.8798</td>
+<td style="text-align: right;">0.696391</td>
+<td style="text-align: right;">-62.6434</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">-61.8798</td>
-<td style="text-align: right;">62.2003</td>
-<td style="text-align: right;">-0.456133</td>
-<td style="text-align: right;">-0.456133</td>
+<td style="text-align: right;">-62.6434</td>
+<td style="text-align: right;">62.6435</td>
+<td style="text-align: right;">-0.000105488</td>
+<td style="text-align: right;">-0.000105488</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">994</td>
 <td style="text-align: right;">1494</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.68668</td>
-<td style="text-align: right;">-61.8798</td>
+<td style="text-align: right;">0.691856</td>
+<td style="text-align: right;">-62.6476</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.53333</td>
-<td style="text-align: right;">-61.8798</td>
-<td style="text-align: right;">62.166</td>
+<td style="text-align: right;">0.997492</td>
+<td style="text-align: right;">-62.6476</td>
+<td style="text-align: right;">62.6476</td>
+<td style="text-align: right;">0.00251106</td>
+<td style="text-align: right;">0.00251106</td>
+<td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.628615</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">995</td>
 <td style="text-align: right;">1495</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.740131</td>
-<td style="text-align: right;">-62.0942</td>
-<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">0.691856</td>
+<td style="text-align: right;">-62.6476</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.918288</td>
-<td style="text-align: right;">-62.0942</td>
-<td style="text-align: right;">62.0976</td>
-<td style="text-align: right;">0.152228</td>
-<td style="text-align: right;">0.152228</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.562055</td>
+<td style="text-align: right;">-62.6476</td>
+<td style="text-align: right;">63.0415</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.576155</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">996</td>
 <td style="text-align: right;">1496</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.740131</td>
-<td style="text-align: right;">-62.0942</td>
-<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">0.642813</td>
+<td style="text-align: right;">-63.2894</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.857083</td>
-<td style="text-align: right;">-62.0942</td>
-<td style="text-align: right;">62.2991</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.446031</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">0.674628</td>
+<td style="text-align: right;">-63.2894</td>
+<td style="text-align: right;">63.3154</td>
+<td style="text-align: right;">0.393594</td>
+<td style="text-align: right;">0.393594</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">997</td>
 <td style="text-align: right;">1497</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.740131</td>
-<td style="text-align: right;">-62.0942</td>
+<td style="text-align: right;">0.642813</td>
+<td style="text-align: right;">-63.2894</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.180199</td>
-<td style="text-align: right;">-62.0942</td>
-<td style="text-align: right;">63.6064</td>
+<td style="text-align: right;">0.473207</td>
+<td style="text-align: right;">-63.2894</td>
+<td style="text-align: right;">64.2324</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.71369</td>
+<td style="text-align: right;">0.748221</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">998</td>
 <td style="text-align: right;">1498</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.740131</td>
-<td style="text-align: right;">-62.0942</td>
+<td style="text-align: right;">0.732538</td>
+<td style="text-align: right;">-62.9802</td>
+<td style="text-align: right;">3.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.964751</td>
-<td style="text-align: right;">-62.0942</td>
-<td style="text-align: right;">62.3241</td>
+<td style="text-align: right;">0.83401</td>
+<td style="text-align: right;">-62.9802</td>
+<td style="text-align: right;">63.4267</td>
+<td style="text-align: right;">-0.110177</td>
+<td style="text-align: right;">0.41989</td>
+<td style="text-align: right;">2.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">0.0358848</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">999</td>
 <td style="text-align: right;">1499</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.740131</td>
-<td style="text-align: right;">-62.0942</td>
+<td style="text-align: right;">0.706612</td>
+<td style="text-align: right;">-62.6705</td>
+<td style="text-align: right;">3.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.0716888</td>
-<td style="text-align: right;">-62.0942</td>
-<td style="text-align: right;">63.1314</td>
+<td style="text-align: right;">0.980292</td>
+<td style="text-align: right;">-62.6705</td>
+<td style="text-align: right;">62.8309</td>
+<td style="text-align: right;">-0.174639</td>
+<td style="text-align: right;">-0.174639</td>
+<td style="text-align: right;">2.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">2.63542</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">1000</td>
 <td style="text-align: right;">1500</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.736375</td>
-<td style="text-align: right;">-62.03</td>
+<td style="text-align: right;">0.706612</td>
+<td style="text-align: right;">-62.6705</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">1.0</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">-62.03</td>
-<td style="text-align: right;">62.2222</td>
-<td style="text-align: right;">-0.0419993</td>
-<td style="text-align: right;">-0.0419993</td>
+<td style="text-align: right;">0.326051</td>
+<td style="text-align: right;">-62.6705</td>
+<td style="text-align: right;">63.662</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">1.1207</td>
 <td style="text-align: right;">1.0</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">1.67783</td>
-<td style="text-align: right;">1.67783</td>
+<td style="text-align: right;">2.00762</td>
+<td style="text-align: right;">2.00762</td>
 </tr>
 </tbody>
 </table>
@@ -1064,9 +1059,9 @@ Quantiles
 <section id="prior-predictive-check" class="level3" data-number="1.3">
 <h3 data-number="1.3" class="anchored" data-anchor-id="prior-predictive-check"><span class="header-section-number">1.3</span> Prior predictive check</h3>
 <p>Here we pass in a vector containing <code>missing</code>. Sampling then generates observations.</p>
-<div id="3993f341" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>observations <span class="op">=</span> <span class="fu">Vector</span><span class="dt">{Missing}</span>(<span class="cn">missing</span>, <span class="fu">length</span>(coin_flips))</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>prior_check <span class="op">=</span> <span class="fu">predict</span>(<span class="fu">coin</span>(observations), prior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="6c918e87" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>observations <span class="op">=</span> <span class="fu">Vector</span><span class="dt">{Missing}</span>(<span class="cn">missing</span>, <span class="fu">length</span>(coin_flips))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>prior_check <span class="op">=</span> <span class="fu">predict</span>(<span class="fu">coin</span>(observations), prior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <div class="ansi-escaped-output">
 <pre>Chains MCMC chain (1000×100×1 Array{Float64, 3}):
@@ -1078,57 +1073,57 @@ internals         =
 Summary Statistics
  <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold">  ess_bulk </span> <span class="ansi-bold"> ess_tail </span> <span class="ansi-bold">    rhat </span> <span class="ansi-bold"> </span> ⋯
  <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">   Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> </span> ⋯
-     data[1]    0.5020    0.5002    0.0149   1129.5176        NaN    1.0013    ⋯
-     data[2]    0.4990    0.5002    0.0150   1115.1860        NaN    0.9992    ⋯
-     data[3]    0.4840    0.5000    0.0153   1074.5147        NaN    0.9994    ⋯
-     data[4]    0.4890    0.5001    0.0158   1002.7430        NaN    0.9990    ⋯
-     data[5]    0.5040    0.5002    0.0145   1195.2131        NaN    0.9994    ⋯
-     data[6]    0.4770    0.4997    0.0161    958.5671        NaN    0.9992    ⋯
-     data[7]    0.4970    0.5002    0.0164    929.4207        NaN    0.9990    ⋯
-     data[8]    0.4810    0.4999    0.0152   1087.3250        NaN    0.9990    ⋯
-     data[9]    0.5030    0.5002    0.0165    921.2286        NaN    0.9999    ⋯
-    data[10]    0.5010    0.5002    0.0153   1074.5745        NaN    0.9992    ⋯
-    data[11]    0.4900    0.5002    0.0151   1092.7840        NaN    1.0006    ⋯
-    data[12]    0.4810    0.4999    0.0156   1027.6579        NaN    0.9990    ⋯
-    data[13]    0.5000    0.5003    0.0166    912.3901        NaN       NaN    ⋯
-    data[14]    0.4820    0.4999    0.0179    784.0384        NaN    1.0003    ⋯
-    data[15]    0.5050    0.5002    0.0170    868.0152        NaN    0.9991    ⋯
-    data[16]    0.5170    0.5000    0.0155   1045.1773        NaN    1.0024    ⋯
-    data[17]    0.4930    0.5002    0.0172    845.4480        NaN    0.9997    ⋯
-    data[18]    0.5130    0.5001    0.0153   1067.2481        NaN    0.9990    ⋯
-    data[19]    0.4900    0.5002    0.0166    903.4536        NaN    1.0006    ⋯
-    data[20]    0.4970    0.5002    0.0164    926.1775        NaN    0.9990    ⋯
-    data[21]    0.4740    0.4996    0.0154   1047.9563        NaN    1.0006    ⋯
-    data[22]    0.4770    0.4997    0.0174    825.8578        NaN    1.0015    ⋯
-    data[23]    0.5030    0.5002    0.0166    910.1656        NaN    0.9993    ⋯
+     data[1]    0.4740    0.4996    0.0167    894.4145        NaN    0.9991    ⋯
+     data[2]    0.4800    0.4998    0.0163    942.2930        NaN    0.9990    ⋯
+     data[3]    0.5160    0.5000    0.0161    959.5073        NaN    0.9990    ⋯
+     data[4]    0.4770    0.4997    0.0149   1125.1091        NaN    1.0015    ⋯
+     data[5]    0.4810    0.4999    0.0160    978.6500        NaN    0.9990    ⋯
+     data[6]    0.4530    0.4980    0.0154   1046.2535        NaN    0.9997    ⋯
+     data[7]    0.4860    0.5001    0.0158    997.1188        NaN    0.9993    ⋯
+     data[8]    0.4750    0.4996    0.0154   1058.7087        NaN    0.9997    ⋯
+     data[9]    0.4570    0.4984    0.0156   1017.9016        NaN    1.0002    ⋯
+    data[10]    0.4790    0.4998    0.0163    939.8757        NaN    0.9993    ⋯
+    data[11]    0.4460    0.4973    0.0158    985.5445        NaN    0.9990    ⋯
+    data[12]    0.4690    0.4993    0.0162    944.7150        NaN    0.9990    ⋯
+    data[13]    0.4820    0.4999    0.0170    866.8493        NaN    1.0048    ⋯
+    data[14]    0.4690    0.4993    0.0161    967.5290        NaN    0.9995    ⋯
+    data[15]    0.4640    0.4990    0.0179    776.0562        NaN    0.9991    ⋯
+    data[16]    0.4890    0.5001    0.0162    952.3602        NaN    1.0045    ⋯
+    data[17]    0.4810    0.4999    0.0154   1056.9883        NaN    0.9995    ⋯
+    data[18]    0.4930    0.5002    0.0156   1024.8998        NaN    0.9997    ⋯
+    data[19]    0.4730    0.4995    0.0158   1003.1111        NaN    1.0002    ⋯
+    data[20]    0.4500    0.4977    0.0155   1031.8738        NaN    0.9994    ⋯
+    data[21]    0.4800    0.4998    0.0165    913.7015        NaN    0.9994    ⋯
+    data[22]    0.4940    0.5002    0.0173    836.4189        NaN    0.9994    ⋯
+    data[23]    0.4780    0.4998    0.0164    928.9019        NaN    1.0013    ⋯
       ⋮           ⋮         ⋮         ⋮          ⋮          ⋮          ⋮       ⋱
 <span class="ansi-cyan-fg">                                                    1 column and 77 rows omitted</span>
 Quantiles
  <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    2.5% </span> <span class="ansi-bold">   25.0% </span> <span class="ansi-bold">   50.0% </span> <span class="ansi-bold">   75.0% </span> <span class="ansi-bold">   97.5% </span>
  <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span>
-     data[1]    0.0000    0.0000    1.0000    1.0000    1.0000
+     data[1]    0.0000    0.0000    0.0000    1.0000    1.0000
      data[2]    0.0000    0.0000    0.0000    1.0000    1.0000
-     data[3]    0.0000    0.0000    0.0000    1.0000    1.0000
+     data[3]    0.0000    0.0000    1.0000    1.0000    1.0000
      data[4]    0.0000    0.0000    0.0000    1.0000    1.0000
-     data[5]    0.0000    0.0000    1.0000    1.0000    1.0000
+     data[5]    0.0000    0.0000    0.0000    1.0000    1.0000
      data[6]    0.0000    0.0000    0.0000    1.0000    1.0000
      data[7]    0.0000    0.0000    0.0000    1.0000    1.0000
      data[8]    0.0000    0.0000    0.0000    1.0000    1.0000
-     data[9]    0.0000    0.0000    1.0000    1.0000    1.0000
-    data[10]    0.0000    0.0000    1.0000    1.0000    1.0000
+     data[9]    0.0000    0.0000    0.0000    1.0000    1.0000
+    data[10]    0.0000    0.0000    0.0000    1.0000    1.0000
     data[11]    0.0000    0.0000    0.0000    1.0000    1.0000
     data[12]    0.0000    0.0000    0.0000    1.0000    1.0000
-    data[13]    0.0000    0.0000    0.5000    1.0000    1.0000
+    data[13]    0.0000    0.0000    0.0000    1.0000    1.0000
     data[14]    0.0000    0.0000    0.0000    1.0000    1.0000
-    data[15]    0.0000    0.0000    1.0000    1.0000    1.0000
-    data[16]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[15]    0.0000    0.0000    0.0000    1.0000    1.0000
+    data[16]    0.0000    0.0000    0.0000    1.0000    1.0000
     data[17]    0.0000    0.0000    0.0000    1.0000    1.0000
-    data[18]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[18]    0.0000    0.0000    0.0000    1.0000    1.0000
     data[19]    0.0000    0.0000    0.0000    1.0000    1.0000
     data[20]    0.0000    0.0000    0.0000    1.0000    1.0000
     data[21]    0.0000    0.0000    0.0000    1.0000    1.0000
     data[22]    0.0000    0.0000    0.0000    1.0000    1.0000
-    data[23]    0.0000    0.0000    1.0000    1.0000    1.0000
+    data[23]    0.0000    0.0000    0.0000    1.0000    1.0000
       ⋮           ⋮         ⋮         ⋮         ⋮         ⋮
 <span class="ansi-cyan-fg">                                                 77 rows omitted</span>
 </pre>
@@ -1136,44 +1131,44 @@ Quantiles
 </div>
 </div>
 <p><code>prior_check</code> is a <code>Chains</code> instance. To convert to an <code>Array</code>, use</p>
-<div id="5333e61a" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Array</span>(prior_check, [<span class="op">:</span>parameters])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="9f654256" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Array</span>(prior_check, [<span class="op">:</span>parameters])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <pre><code>1000×100 Matrix{Float64}:
- 0.0  1.0  0.0  0.0  1.0  1.0  1.0  1.0  …  1.0  1.0  1.0  0.0  1.0  1.0  1.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0  …  0.0  0.0  0.0  0.0  0.0  1.0  0.0
+ 1.0  0.0  1.0  0.0  0.0  1.0  0.0  1.0     0.0  1.0  0.0  1.0  1.0  0.0  1.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  1.0  0.0     0.0  0.0  1.0  0.0  0.0  0.0  0.0
  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0     1.0  1.0  1.0  1.0  1.0  1.0  1.0
- 1.0  0.0  0.0  0.0  1.0  0.0  1.0  1.0     0.0  0.0  1.0  1.0  1.0  1.0  1.0
- 1.0  1.0  0.0  0.0  1.0  0.0  0.0  0.0     0.0  0.0  0.0  0.0  0.0  1.0  0.0
- 1.0  1.0  1.0  1.0  1.0  0.0  0.0  1.0     0.0  0.0  1.0  1.0  0.0  1.0  0.0
- 0.0  0.0  0.0  0.0  0.0  1.0  0.0  0.0  …  0.0  0.0  0.0  0.0  0.0  0.0  0.0
- 1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0     1.0  1.0  1.0  1.0  1.0  1.0  1.0
- 0.0  1.0  1.0  0.0  1.0  0.0  0.0  0.0     0.0  1.0  1.0  1.0  0.0  1.0  1.0
- 0.0  1.0  1.0  0.0  0.0  0.0  0.0  0.0     0.0  1.0  0.0  0.0  0.0  0.0  1.0
- 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0     0.0  0.0  0.0  0.0  0.0  0.0  0.0
- 0.0  0.0  0.0  0.0  1.0  1.0  0.0  1.0  …  1.0  1.0  1.0  1.0  1.0  1.0  1.0
- 0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0     0.0  0.0  1.0  0.0  0.0  0.0  0.0
- 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0     0.0  0.0  0.0  0.0  0.0  1.0  0.0
+ 0.0  1.0  1.0  1.0  1.0  0.0  0.0  1.0     0.0  1.0  1.0  0.0  0.0  0.0  1.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  …  0.0  0.0  0.0  0.0  0.0  0.0  1.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0     0.0  0.0  0.0  1.0  0.0  0.0  0.0
+ 1.0  1.0  1.0  1.0  1.0  0.0  1.0  0.0     1.0  0.0  1.0  1.0  1.0  1.0  1.0
+ 0.0  1.0  1.0  0.0  0.0  1.0  1.0  0.0     1.0  1.0  0.0  0.0  0.0  0.0  1.0
+ 1.0  1.0  1.0  0.0  1.0  1.0  1.0  1.0     1.0  1.0  1.0  1.0  1.0  1.0  1.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0  …  1.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 1.0  0.0  1.0  0.0  1.0  1.0  1.0  1.0     0.0  1.0  0.0  1.0  1.0  0.0  0.0
+ 1.0  1.0  1.0  1.0  0.0  1.0  0.0  1.0     1.0  1.0  1.0  1.0  1.0  0.0  0.0
  ⋮                        ⋮              ⋱            ⋮                   
- 0.0  0.0  0.0  1.0  0.0  0.0  0.0  1.0     0.0  0.0  0.0  0.0  0.0  0.0  0.0
- 1.0  0.0  0.0  1.0  1.0  1.0  0.0  1.0     0.0  0.0  0.0  1.0  0.0  0.0  1.0
- 1.0  1.0  1.0  0.0  0.0  0.0  1.0  1.0  …  0.0  1.0  0.0  1.0  1.0  1.0  1.0
- 0.0  1.0  1.0  1.0  1.0  0.0  1.0  0.0     1.0  1.0  1.0  1.0  0.0  0.0  0.0
- 0.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0     0.0  0.0  0.0  0.0  1.0  0.0  0.0
+ 1.0  0.0  1.0  0.0  1.0  1.0  1.0  0.0     1.0  0.0  1.0  0.0  1.0  1.0  1.0
  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0     0.0  0.0  0.0  0.0  0.0  0.0  0.0
- 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0     0.0  0.0  0.0  0.0  0.0  0.0  0.0
- 1.0  1.0  1.0  0.0  1.0  0.0  0.0  0.0  …  0.0  0.0  1.0  0.0  0.0  0.0  0.0
- 1.0  0.0  1.0  0.0  1.0  1.0  0.0  1.0     1.0  1.0  0.0  0.0  0.0  1.0  1.0
- 0.0  0.0  1.0  0.0  0.0  1.0  1.0  0.0     0.0  1.0  0.0  0.0  0.0  1.0  0.0
- 1.0  0.0  0.0  1.0  1.0  0.0  1.0  0.0     0.0  0.0  1.0  1.0  0.0  0.0  1.0
- 1.0  0.0  1.0  0.0  0.0  0.0  0.0  0.0     0.0  1.0  0.0  0.0  0.0  0.0  0.0</code></pre>
+ 1.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  …  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  1.0  0.0  0.0  0.0  1.0     1.0  1.0  0.0  0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0     0.0  0.0  1.0  0.0  0.0  0.0  0.0
+ 0.0  1.0  1.0  1.0  1.0  1.0  1.0  0.0     1.0  0.0  0.0  0.0  0.0  1.0  0.0
+ 1.0  1.0  1.0  1.0  1.0  0.0  1.0  0.0     1.0  1.0  1.0  1.0  1.0  1.0  1.0
+ 1.0  1.0  1.0  0.0  1.0  1.0  0.0  1.0  …  0.0  0.0  0.0  0.0  1.0  0.0  0.0
+ 1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0     1.0  1.0  1.0  1.0  1.0  1.0  1.0
+ 0.0  1.0  1.0  1.0  1.0  1.0  0.0  1.0     1.0  1.0  1.0  0.0  0.0  0.0  1.0
+ 1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0     1.0  1.0  1.0  1.0  0.0  1.0  1.0
+ 1.0  0.0  1.0  1.0  1.0  0.0  1.0  1.0     0.0  0.0  0.0  0.0  1.0  0.0  1.0</code></pre>
 </div>
 </div>
 </section>
 <section id="posterior-predictive-check" class="level3" data-number="1.4">
 <h3 data-number="1.4" class="anchored" data-anchor-id="posterior-predictive-check"><span class="header-section-number">1.4</span> Posterior predictive check</h3>
-<div id="d86d349b" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>observations <span class="op">=</span> <span class="fu">Vector</span><span class="dt">{Missing}</span>(<span class="cn">missing</span>, <span class="fu">length</span>(coin_flips))</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>posterior_check <span class="op">=</span> <span class="fu">predict</span>(<span class="fu">coin</span>(observations), posterior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="412c4148" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>observations <span class="op">=</span> <span class="fu">Vector</span><span class="dt">{Missing}</span>(<span class="cn">missing</span>, <span class="fu">length</span>(coin_flips))</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>posterior_check <span class="op">=</span> <span class="fu">predict</span>(<span class="fu">coin</span>(observations), posterior)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <div class="ansi-escaped-output">
 <pre>Chains MCMC chain (1000×100×1 Array{Float64, 3}):
@@ -1185,29 +1180,29 @@ internals         =
 Summary Statistics
  <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold">  ess_bulk </span> <span class="ansi-bold"> ess_tail </span> <span class="ansi-bold">    rhat </span> <span class="ansi-bold"> </span> ⋯
  <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">   Float64 </span> <span class="ansi-bright-black-fg">  Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> </span> ⋯
-     data[1]    0.6950    0.4606    0.0162    806.5250        NaN    0.9990    ⋯
-     data[2]    0.7200    0.4492    0.0138   1059.0700        NaN    1.0003    ⋯
-     data[3]    0.7090    0.4545    0.0157    839.6809        NaN    1.0020    ⋯
-     data[4]    0.7040    0.4567    0.0147    964.4695        NaN    0.9991    ⋯
-     data[5]    0.7540    0.4309    0.0159    730.3067        NaN    1.0016    ⋯
-     data[6]    0.7120    0.4531    0.0156    844.1830        NaN    0.9992    ⋯
-     data[7]    0.7310    0.4437    0.0150    877.0102        NaN    1.0012    ⋯
-     data[8]    0.6890    0.4631    0.0147    993.3179        NaN    0.9996    ⋯
-     data[9]    0.7270    0.4457    0.0145    945.7903        NaN    1.0008    ⋯
-    data[10]    0.6880    0.4635    0.0148    980.5392        NaN    0.9995    ⋯
-    data[11]    0.7130    0.4526    0.0148    931.4351        NaN    1.0016    ⋯
-    data[12]    0.6890    0.4631    0.0153    914.0550        NaN    1.0000    ⋯
-    data[13]    0.7110    0.4535    0.0139   1068.9101        NaN    0.9998    ⋯
-    data[14]    0.6850    0.4647    0.0149    968.0954        NaN    1.0000    ⋯
-    data[15]    0.6710    0.4701    0.0148   1005.1989        NaN    0.9990    ⋯
-    data[16]    0.7070    0.4554    0.0137   1104.0930        NaN    0.9994    ⋯
-    data[17]    0.7110    0.4535    0.0160    801.9042        NaN    0.9992    ⋯
-    data[18]    0.6940    0.4611    0.0154    898.1070        NaN    1.0027    ⋯
-    data[19]    0.7140    0.4521    0.0145    978.8041        NaN    0.9991    ⋯
-    data[20]    0.7020    0.4576    0.0144   1013.1274        NaN    0.9993    ⋯
-    data[21]    0.7070    0.4554    0.0136   1119.4938        NaN    1.0007    ⋯
-    data[22]    0.7300    0.4442    0.0137   1044.1688        NaN    0.9990    ⋯
-    data[23]    0.6910    0.4623    0.0160    829.7345        NaN    0.9990    ⋯
+     data[1]    0.6950    0.4606    0.0156    870.5053        NaN    0.9994    ⋯
+     data[2]    0.7220    0.4482    0.0154    851.6916        NaN    1.0006    ⋯
+     data[3]    0.6760    0.4682    0.0154    927.8906        NaN    0.9997    ⋯
+     data[4]    0.7020    0.4576    0.0147    974.9859        NaN    1.0013    ⋯
+     data[5]    0.7090    0.4545    0.0146    965.4606        NaN    1.0004    ⋯
+     data[6]    0.7130    0.4526    0.0158    817.4231        NaN    1.0008    ⋯
+     data[7]    0.6980    0.4594    0.0141   1063.8987        NaN    0.9997    ⋯
+     data[8]    0.7100    0.4540    0.0150    918.3674        NaN    0.9992    ⋯
+     data[9]    0.6820    0.4659    0.0149    976.3353        NaN    0.9993    ⋯
+    data[10]    0.7090    0.4545    0.0153    881.8781        NaN    1.0007    ⋯
+    data[11]    0.7020    0.4576    0.0150    935.3641        NaN    1.0005    ⋯
+    data[12]    0.7030    0.4572    0.0143   1015.8961        NaN    0.9998    ⋯
+    data[13]    0.7220    0.4482    0.0151    882.0770        NaN    1.0024    ⋯
+    data[14]    0.6830    0.4655    0.0160    845.2821        NaN    1.0034    ⋯
+    data[15]    0.7040    0.4567    0.0152    901.7849        NaN    0.9995    ⋯
+    data[16]    0.6720    0.4697    0.0149    999.1920        NaN    0.9990    ⋯
+    data[17]    0.6890    0.4631    0.0142   1069.7878        NaN    0.9992    ⋯
+    data[18]    0.6950    0.4606    0.0147    988.4944        NaN    0.9990    ⋯
+    data[19]    0.6840    0.4651    0.0153    919.7299        NaN    0.9990    ⋯
+    data[20]    0.7180    0.4502    0.0144    971.5694        NaN    1.0023    ⋯
+    data[21]    0.6870    0.4639    0.0149    965.0186        NaN    0.9990    ⋯
+    data[22]    0.7260    0.4462    0.0141   1007.4908        NaN    1.0019    ⋯
+    data[23]    0.7010    0.4580    0.0145    993.5721        NaN    1.0007    ⋯
       ⋮           ⋮         ⋮         ⋮          ⋮          ⋮          ⋮       ⋱
 <span class="ansi-cyan-fg">                                                    1 column and 77 rows omitted</span>
 Quantiles
@@ -1217,7 +1212,7 @@ Quantiles
      data[2]    0.0000    0.0000    1.0000    1.0000    1.0000
      data[3]    0.0000    0.0000    1.0000    1.0000    1.0000
      data[4]    0.0000    0.0000    1.0000    1.0000    1.0000
-     data[5]    0.0000    1.0000    1.0000    1.0000    1.0000
+     data[5]    0.0000    0.0000    1.0000    1.0000    1.0000
      data[6]    0.0000    0.0000    1.0000    1.0000    1.0000
      data[7]    0.0000    0.0000    1.0000    1.0000    1.0000
      data[8]    0.0000    0.0000    1.0000    1.0000    1.0000
@@ -1253,10 +1248,10 @@ Quantiles
 <li>name_map (to define sections, NamedTuple section -&gt; names, default section is <code>:parameters</code>)</li>
 <li>info</li>
 </ul>
-<div id="dfd91db2" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>value <span class="op">=</span> <span class="fu">rand</span>(<span class="fl">500</span>, <span class="fl">2</span>, <span class="fl">3</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>chn <span class="op">=</span> <span class="fu">Chains</span>(value, [<span class="op">:</span>a, <span class="op">:</span>b])</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>chn2 <span class="op">=</span> <span class="fu">Chains</span>(value, [<span class="st">"A[1]"</span>, <span class="st">"A[2]"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="b0dce37d" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>value <span class="op">=</span> <span class="fu">rand</span>(<span class="fl">500</span>, <span class="fl">2</span>, <span class="fl">3</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>chn <span class="op">=</span> <span class="fu">Chains</span>(value, [<span class="op">:</span>a, <span class="op">:</span>b])</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>chn2 <span class="op">=</span> <span class="fu">Chains</span>(value, [<span class="st">"A[1]"</span>, <span class="st">"A[2]"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="13">
 <div class="ansi-escaped-output">
 <pre>Chains MCMC chain (500×2×3 Array{Float64, 3}):
@@ -1267,14 +1262,14 @@ parameters        = A[1], A[2]
 Summary Statistics
  <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    mean </span> <span class="ansi-bold">     std </span> <span class="ansi-bold">    mcse </span> <span class="ansi-bold">  ess_bulk </span> <span class="ansi-bold">  ess_tail </span> <span class="ansi-bold">    rhat </span>  ⋯
  <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg">   Float64 </span> <span class="ansi-bright-black-fg">   Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span>  ⋯
-        A[1]    0.5145    0.2837    0.0073   1470.6816   1491.5474    0.9996   ⋯
-        A[2]    0.5045    0.2896    0.0074   1583.6141   1579.6518    1.0016   ⋯
+        A[1]    0.5007    0.2915    0.0075   1478.7783   1220.9592    1.0016   ⋯
+        A[2]    0.4935    0.2889    0.0078   1400.6173   1385.9097    1.0018   ⋯
 <span class="ansi-cyan-fg">                                                                1 column omitted</span>
 Quantiles
  <span class="ansi-bold"> parameters </span> <span class="ansi-bold">    2.5% </span> <span class="ansi-bold">   25.0% </span> <span class="ansi-bold">   50.0% </span> <span class="ansi-bold">   75.0% </span> <span class="ansi-bold">   97.5% </span>
  <span class="ansi-bright-black-fg">     Symbol </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span> <span class="ansi-bright-black-fg"> Float64 </span>
-        A[1]    0.0319    0.2778    0.5104    0.7625    0.9775
-        A[2]    0.0249    0.2575    0.5046    0.7576    0.9791
+        A[1]    0.0277    0.2424    0.4971    0.7594    0.9765
+        A[2]    0.0248    0.2430    0.4968    0.7304    0.9749
 </pre>
 </div>
 </div>
@@ -1285,17 +1280,17 @@ Quantiles
 <p><code>quantile(chn; sections = :parameters)</code></p>
 <p>or <code>describe(chn; sections = :parameters)</code> to get both at once</p>
 <p>Turings <code>sample</code> returns a <code>Chains</code> instance with sections <code>:parameters</code> and <code>:internals</code>.</p>
-<div id="9fb5d6ee" class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>posterior.name_map</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="28ed43e5" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>posterior.name_map</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="14">
 <pre><code>(parameters = [:p], internals = [:lp, :n_steps, :is_accept, :acceptance_rate, :log_density, :hamiltonian_energy, :hamiltonian_energy_error, :max_hamiltonian_energy_error, :tree_depth, :numerical_error, :step_size, :nom_step_size])</code></pre>
 </div>
 </div>
 <p>To convert a chain to a DataFrame containing the <code>:parameters</code> section only, one can do</p>
-<div id="1e912284" class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(posterior[posterior.name_map.parameters])</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># or DataFrame(MCMCchains.get_sections(posterior, :parameters))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="5ce6b2b3" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(posterior[posterior.name_map.parameters])</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># or DataFrame(MCMCchains.get_sections(posterior, :parameters))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="15">
 <div>
 <div><div style="float: left;"><span>1000×3 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">975 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
@@ -1319,79 +1314,79 @@ Quantiles
 <td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
 <td style="text-align: right;">501</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.661758</td>
+<td style="text-align: right;">0.716273</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
 <td style="text-align: right;">502</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.641578</td>
+<td style="text-align: right;">0.686689</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
 <td style="text-align: right;">503</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.709041</td>
+<td style="text-align: right;">0.686689</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
 <td style="text-align: right;">504</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.709041</td>
+<td style="text-align: right;">0.717274</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
 <td style="text-align: right;">505</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.755824</td>
+<td style="text-align: right;">0.717274</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
 <td style="text-align: right;">506</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.727758</td>
+<td style="text-align: right;">0.716458</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">7</td>
 <td style="text-align: right;">507</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.723545</td>
+<td style="text-align: right;">0.743146</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">8</td>
 <td style="text-align: right;">508</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.647271</td>
+<td style="text-align: right;">0.754243</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">9</td>
 <td style="text-align: right;">509</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.727068</td>
+<td style="text-align: right;">0.622452</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">10</td>
 <td style="text-align: right;">510</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.727068</td>
+<td style="text-align: right;">0.595396</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">11</td>
 <td style="text-align: right;">511</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.727068</td>
+<td style="text-align: right;">0.59396</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">12</td>
 <td style="text-align: right;">512</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.677694</td>
+<td style="text-align: right;">0.644451</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">13</td>
 <td style="text-align: right;">513</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.671429</td>
+<td style="text-align: right;">0.673646</td>
 </tr>
 <tr class="even">
 <td style="text-align: right;">⋮</td>
@@ -1403,73 +1398,73 @@ Quantiles
 <td class="rowNumber" style="text-align: right; font-weight: bold;">989</td>
 <td style="text-align: right;">1489</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.728076</td>
+<td style="text-align: right;">0.683349</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">990</td>
 <td style="text-align: right;">1490</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.730009</td>
+<td style="text-align: right;">0.683349</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">991</td>
 <td style="text-align: right;">1491</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.730009</td>
+<td style="text-align: right;">0.677488</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">992</td>
 <td style="text-align: right;">1492</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.650878</td>
+<td style="text-align: right;">0.696995</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">993</td>
 <td style="text-align: right;">1493</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.68668</td>
+<td style="text-align: right;">0.696391</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">994</td>
 <td style="text-align: right;">1494</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.68668</td>
+<td style="text-align: right;">0.691856</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">995</td>
 <td style="text-align: right;">1495</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.740131</td>
+<td style="text-align: right;">0.691856</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">996</td>
 <td style="text-align: right;">1496</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.740131</td>
+<td style="text-align: right;">0.642813</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">997</td>
 <td style="text-align: right;">1497</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.740131</td>
+<td style="text-align: right;">0.642813</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">998</td>
 <td style="text-align: right;">1498</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.740131</td>
+<td style="text-align: right;">0.732538</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">999</td>
 <td style="text-align: right;">1499</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.740131</td>
+<td style="text-align: right;">0.706612</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">1000</td>
 <td style="text-align: right;">1500</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.736375</td>
+<td style="text-align: right;">0.706612</td>
 </tr>
 </tbody>
 </table>
