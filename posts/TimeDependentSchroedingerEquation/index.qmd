@@ -2,8 +2,10 @@
 title: "Time-dependent Schrödinger equation"
 description: "Solving the time-dependent Schrödinger equation in Julia"
 jupyter: julia-1.10
-categories: julia
-draft: true
+categories: 
+  - julia
+  - physics
+draft: false
 ---
 
 The one-dimensional time-dependent Schrödinger equation (TDSE) for a potential $V(x)$ 
@@ -13,7 +15,7 @@ $$
 i\hbar \frac{\partial \psi(x,t)}{\partial t} = -\frac{\hbar^2}{2m} \frac{\partial^2 \psi(x,t)}{\partial x^2} + V(x) \psi(x,t)
 $$
 
-We also need to specify 
+To specify a problem, we need to specify 
 
 - a domain $0 \le x \le L$,
 - initial conditions $\psi(x, t=0) = \psi_0(x)$ and 
@@ -41,6 +43,8 @@ $$
 ```{julia}
 using CairoMakie
 using LaTeXStrings
+
+set_theme!()
 
 nx = 301
 nt = 100001
@@ -195,10 +199,49 @@ where:
 
 
 ```{julia}
-#using LinearAlgebra
+using LinearAlgebra
 
-#eigen(SymTridiagonal(d, e))
+a = 1/dx^2 .+ V[2:(end-1)]
+b = -1/(2*dx^2) .* ones(length(a)-1)
+
+F = eigen(SymTridiagonal(a, b));
 ```
+
+The k-th eigenvalue can be accessed using F.values[k], the k-th eigenvector as F.vectors[:,k].
+
+```{julia}
+E_j = F.values[1:70]
+ψⱼ = vcat(zeros(70)', F.vectors[:,1:70], zeros(70)')
+
+cⱼ = ψⱼ' * Ψ₀
+
+lines(x, abs2.(ψⱼ * (cⱼ .* exp.(-im*E_j*5000*dt))  )) 
+```
+
+## Animation
+
+```{julia}
+
+t = Observable(0)
+y = @lift abs2.(ψⱼ * (cⱼ .* exp.(-im*E_j*$t*dt)))
+
+f = Figure()
+ax = Axis(f[1,1], xlabel = L"x/L", ylabel = L"|\psi(x)|^2",
+           title = @lift "t = $($t) dt")
+lines!(ax, x, y;
+          color = :blue)
+xlims!(ax, 0.0, 1.0)
+ylims!(ax, 0, 20)
+
+
+record(f, "schroedinger_animation.gif", 0:100:30000, framerate = 30) do i 
+  t[] = i  
+end
+
+```
+
+![Schroedinger animation](schroedinger_animation.gif)
+
 
 ## References
 

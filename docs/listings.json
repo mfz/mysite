@@ -2,9 +2,13 @@
   {
     "listing": "/posts.html",
     "items": [
+      "/posts/DoublePendulum/index.html",
+      "/posts/TuringIntro/index.html",
+      "/posts/TimeDependentSchroedingerEquation/index.html",
       "/posts/TensorNotation/index.html",
       "/posts/Pendulum/index.html",
-      "/posts/BayesianLCA/index.html"
+      "/posts/BayesianLCA/index.html",
+      "/posts/LatticeBoltzmannMethod/index.html"
     ]
   }
 ]

@@ -1,0 +1,213 @@
+---
+title: "Dirichlet Process (DP) for mixture modelling"
+description: "Using the Dirichlet Process to model Gaussian mixtures with unknown number of components"
+format: 
+  html: 
+    toc: true
+    number-sections: true
+jupyter: julia-1.10
+draft: true
+---
+
+### Two-component Gaussian Mixture Model (GMM)
+
+A generative model for a two-component Gaussian mixture, with $z_i$ as the *latent cluster assignment* variable, can be written as
+
+$$
+\begin{align}
+\pi_1 &\sim Beta(a,b) \\
+\pi_2 &= 1 - \pi_1 \\
+\mu_1 &\sim N(0, 10) \\
+\mu_2 &\sim N(0, 10) \\
+z_i &\sim Cat(\pi_1, \pi_2) \\
+x_i &\sim N(\mu_{z_i}, \sigma)
+\end{align}
+$$
+
+
+Here the Beta distribution is used as a prior for the first mixing weight $\pi_1$. The second mixing weight $\pi_2$ is
+given by the constraint that $\pi_1 + \pi_2 = 1$.
+
+(Note: The Beta distribution can be seen as a characterization of a coin-flip).
+
+
+### K-component Gaussian Mixture Model
+
+The model can be extended to more than two components by using the Dirichlet distribution as prior for the mixing weights.
+The Dirichlet distribution is the extension of the Beta distribution to multiple dimensions. It is the appropriate prior 
+when we need to make a $K$-way choice.
+
+$$
+(\pi_1, \pi_2, \ldots, \pi_K) \sim \mathrm{Dirichlet}(\alpha_1, \ldots, \alpha_K) \propto \prod_{j=1}^C \pi_j^{\alpha_j - 1}
+$$
+
+The Dirichlet distribution is the conjugate prior of the Categorical and Multinomial distributions. 
+The mean is $\pi_j = \alpha_j / \sum_k \alpha_k$ while the mode
+is $(\alpha_j - 1)/\sum_k(\alpha_k - 1)$ for $\alpha_k > 1$.  
+
+(Note: The Dirichlet distribution with 6 components can be seen as the characterization of a dice).
+
+The symmetric Dirichlet distribution has the same value $\alpha$ for all components, i.e. $\alpha_k = \alpha$.
+It is a good choice when there is no prior knowledge favouring one component over another. In that case,
+$\alpha$ is called the concentration parameter.
+
+The generative model for a K-component Gaussian Mixture Model with symmetric Dirichlet prior can be written as
+
+$$
+\begin{align}
+(\pi_1, \pi_2, \ldots, \pi_K) &\sim Dirichlet(K,\alpha) \\
+\mu_k &\sim N(0, 10) \\
+z_i &\sim Cat(\pi_1, \pi_2, \ldots, \pi_K) \\
+x_i &\sim N(\mu_{z_i}, \sigma)
+\end{align}
+$$
+
+
+### Infinite Gaussian Mixture Model
+
+Often the number of components $K$ is not known in advance, and it might be arbitrarily large.
+In that case, one can use a *Dirichlet Process (DP)* $DP(\alpha, G_o)$. The Dirichlet Process can be implemented using 
+the stick-breaking construction. Here a stick of unit length is broken iteratively using a Beta distribution:
+
+- start with a stick of length 1
+- at iteration $k$, break of a fraction $\beta_k \sim Beta(1, \alpha)$ of the remaining stick.
+  The length of this piece is $\pi_k = \beta_k \prod_{j=1}^{k-1}(1 - \beta_j)$
+
+The $\pi_k$ now correspond to the mixture weights. The parameters of the mixture components, 
+$\mu_k$ and $\sigma_k$ are drawn from the base distribution $G_o$.
+
+To simulate the number of components $K$, one stops the iteration when the 
+remaining stick is shorter than some small threshold, and renormalizes the
+obtained mixture weights to sum to one.
+
+```{julia}
+using CairoMakie
+using Distributions
+
+function stick_breaking(α; thresh = 1e-5)
+    π = []
+    remaining_stick = 1.0
+    while remaining_stick > thresh 
+        β = rand(Beta(1, α))
+        push!(π, β * remaining_stick)
+        remaining_stick *= (1.0 - β)
+    end
+    return π ./ sum(π)
+end; 
+```
+
+
+Let's look at the number of components we get as a function of $\alpha$.
+
+```{julia}
+function simulate_k(α)
+    niter = 1000
+    k = zeros(Int64, niter)
+    for i = 1:niter
+        π = stick_breaking(α; thresh = 0.001)
+        k[i] = length(π)
+    end
+    return k
+end
+
+f = Figure()
+hist(f[1,1], simulate_k(1.0); axis = (;title = "α = 1.0"))
+hist(f[1,2], simulate_k(0.25); axis = (;title = "α = 0.25"))
+hist(f[2,1], simulate_k(0.1); axis = (;title = "α = 0.1"))
+hist(f[2,2], simulate_k(0.05); axis = (;title = "α = 0.05"))
+f;
+```
+
+
+```{julia}
+using Turing
+using Distributions
+using DataFrames
+using CairoMakie
+using StatsFuns
+
+function stickbreak(v)
+    K = length(v) + 1
+    cumprod_one_minus_v = cumprod(1 .- v)
+
+    eta = [if k == 1
+               v[1]
+           elseif k == K
+               cumprod_one_minus_v[K - 1]
+           else
+               v[k] * cumprod_one_minus_v[k - 1]
+           end
+           for k in 1:K]
+
+    return eta
+end
+
+# this version works with NUTS, but we do not get information about z[i]
+@model function dp_gmm(y, K)
+    N = length(y)  # Number of data points
+
+    μ   ~ filldist(Normal(0, 3), K)
+    σ ~ filldist(Gamma(1, 1/10), K)  # mean = 0.1
+
+    α ~ Gamma(1, 1/10)  # mean = 0.1
+
+    v ~ filldist(Beta(1, α), K - 1)
+    π = stickbreak(v)
+ 
+    y .~ UnivariateGMM(μ, σ, Distributions.Categorical(π))
+end
+
+# this version does not work with NUTS (divergences, rhat NaN)
+@model function dp_gmm2(y, K)
+    N = length(y)  # Number of data points
+
+    μ   ~ filldist(Normal(0, 3), K)
+    σ ~ filldist(Gamma(1, 1/10), K)  # mean = 0.1
+
+    α ~ Gamma(1, 1/10)  # mean = 0.1
+
+    v ~ filldist(Beta(1, α), K - 1)
+    π = stickbreak(v)
+    #z ~ filldist(Distributions.Categorical(π), N)   
+    #y .~ UnivariateGMM(μ, σ, Distributions.Categorical(π))
+
+    #log_target = logsumexp(normlogpdf.(μ', σ', y) .+ log.(π)', dims=2)
+    #Turing.acclogp!(_varinfo, sum(log_target))
+
+    # Likelihood
+    for i in 1:N
+        z = rand(Distributions.Categorical(π))
+        y[i] ~ Normal(μ[z], σ[z])
+    end
+end
+
+```
+
+Note, the second version has severe convergence problems. The reason is probably that
+the computed logprobability fluctuates a lot, depending on which z was chosen.
+The first version integrates over that assignment.
+
+```{julia}
+# Generate synthetic data
+using Random
+Random.seed!(123)
+y = vcat(rand(Normal(-1.5, 0.15), 50), 
+        #rand(Normal(-0.5, 0.15), 50),
+        # rand(Normal(0.5, 0.15), 50), 
+         rand(Normal(1.5, 0.15), 50))
+
+hist(y; bins = 50)
+```
+
+```{julia}
+# Sample from the posterior
+K = 5  # Maximum number of components
+model = dp_gmm(y, K)
+chain = sample(model, NUTS(), 1000)
+
+```
+
+
+### References
+
+- https://luiarthur.github.io/TuringBnpBenchmarks/dpsbgmm 

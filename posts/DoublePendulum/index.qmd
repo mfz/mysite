@@ -1,0 +1,194 @@
+---
+title: "Double pendulum"
+description: "Simulating a double pendulum in Julia"
+jupyter: julia-1.10
+categories: 
+    - julia
+    - physics
+draft: false
+---
+
+The double pendulum in Julia.
+
+First, lets define the Lagrangian $L = T - V$, where $T$ is the kinetic energy of the system
+and $V$ the potential energy.
+
+```{julia}
+using CairoMakie
+using Symbolics
+
+set_theme!()
+```
+
+Define all the variables needed to specify the problem
+
+```{julia}
+@variables g, t, m₁, m₂, l₁, l₂, Θ₁(t), Θ₂(t);
+```
+
+The kinetic and potential energy are easier to express in cartesian coordinates.
+
+```{julia}
+x₁ = l₁ * sin(Θ₁)
+y₁ = - l₁ * cos(Θ₁)
+x₂ = x₁ + l₂ * sin(Θ₂)
+y₂ = y₁ - l₂ * cos(Θ₂);
+```
+
+Define kinetic and potential energy in cartesian coordinates 
+
+```{julia}
+Dt = Differential(t)
+
+ẋ₁ = Dt(x₁)
+ẏ₁ = Dt(y₁)
+ẋ₂ = Dt(x₂)
+ẏ₂ = Dt(y₂)
+
+T₁ = 1/2 * m₁ * (ẋ₁^2 + ẏ₁^2)
+T₂ = 1/2 * m₂ * (ẋ₂^2 + ẏ₂^2)
+T = T₁ + T₂
+
+V₁ = m₁ * g * y₁
+V₂ = m₂ * g * y₂
+V = V₁ + V₂
+
+L = T - V;
+```
+
+
+```{julia}
+simplify(expand_derivatives(L))
+```
+
+The equations of motion are obtained from the Lagrange eqautions for $\Theta_1$ and $\Theta_2$
+
+$$
+\frac{\partial L}{\partial \Theta_1} - \frac{\mathrm{d}}{\mathrm{d}t} \frac{\partial L}{\partial \dot{\Theta}_1} = 0
+$$
+
+
+$$
+\frac{\partial L}{\partial \Theta_2} - \frac{\mathrm{d}}{\mathrm{d}t} \frac{\partial L}{\partial \dot{\Theta}_2} = 0
+$$
+
+
+
+```{julia}
+Θ̇₁ = Dt(Θ₁)
+Θ̇₂ = Dt(Θ₂)
+
+Θ̈₁ = Dt(Θ̇₁)
+Θ̈₂ = Dt(Θ̇₂)
+
+DΘ₁ = Differential(Θ₁)
+DΘ₂ = Differential(Θ₂)
+
+DΘ̇₁ = Differential(Θ̇₁)
+DΘ̇₂ = Differential(Θ̇₂)
+
+L = simplify(expand_derivatives(L))
+
+LE₁ = simplify(expand_derivatives(DΘ₁(L) - Dt(DΘ̇₁(L))); expand = true)
+LE₂ = simplify(expand_derivatives(DΘ₂(L) - Dt(DΘ̇₂(L))); expand = true);
+```
+
+
+We need to run expand_derivatives for LE1 and LE2 to be able to solve the equation! 
+Otherwise we get a singular exception!
+
+Now solve for $\ddot{\Theta}_1$ and $\ddot{\Theta}_2$
+
+```{julia}
+du1, du2 = simplify.(symbolic_linear_solve([LE₁ ~ 0, LE₂ ~ 0], [Θ̈₁, Θ̈₂]))
+```
+
+and create a Julia function that can be used in `ODEProblem`.
+
+```{julia}
+
+u̇ = [Θ̇₁; Θ̇₂; du1; du2]
+
+du, du! = build_function(u̇, [Θ₁, Θ₂, Θ̇₁, Θ̇₂],  [m₁, m₂, l₁, l₂, g], t; expression = Val{false});
+```
+
+Now we can solve the ODE system numerically
+
+```{julia}
+using DifferentialEquations
+
+tspan = (0, 40)
+params = [2.0, 1.0, 2.0, 1.0, 9.81]
+init = [1, -3, -1, 5]
+
+prob = ODEProblem(du, init, tspan, params);
+```
+
+```{julia}
+sol = solve(prob);
+```
+
+
+
+```{julia}
+ti = range(tspan...; length = 1001)
+theta1 = [sol(t)[1] for t in ti]
+theta2 = [sol(t)[2] for t in ti]
+
+f = Figure()
+lines(f[1,1], ti, theta1)
+lines!(f[1,1], ti, theta2)
+
+f
+```
+
+## Animation
+
+```{julia}
+l1 = 2.0
+l2 = 1.0
+
+x1 = l1 * sin.(theta1)
+y1 = -l1 * cos.(theta1)
+x2 = x1 .+ l2 * sin.(theta2)
+y2 = y1 .- l2 * cos.(theta2)
+
+f = Figure()
+
+ax1 = Axis(f[1,1], xlabel = L"t", ylabel = L"\Theta")
+xlims!(ax1, tspan...)
+ylims!(ax1, 
+    1.1 * minimum(vcat(theta1, theta2)),
+    1.1 * maximum(vcat(theta1, theta2)))
+
+ax2 = Axis(f[1,2]; aspect = 1)
+hidedecorations!(ax2)
+hidespines!(ax2)
+l = 1.1*(l1 + l2)
+xlims!(ax2, -l,l)
+ylims!(ax2, -l,l)
+
+record(f, "double_pendulum_animation.gif", 1:length(ti), framerate = 30) do i
+
+    empty!(ax1)
+    lines!(ax1, ti[1:i], theta1[1:i]; color = :blue)
+    lines!(ax1, ti[1:i], theta2[1:i]; color = :red)
+
+    empty!(ax2)
+ 
+    lines!(ax2, [0, x1[i], x2[i]], [0, y1[i], y2[i]]; color = :blue)
+    lines!(ax2, x2[1:i], y2[1:i]; color = (:red, 0.1))
+    scatter!(ax2, [x1[i], x2[i]], [y1[i], y2[i]]; markersize = 20, color = [:blue, :red])
+
+end;
+
+```
+
+![Double pendulum animation](double_pendulum_animation.gif)
+
+## References
+
+see double-pendulum.jl here: https://www.phys.uconn.edu/~rozman/Courses/P3101_22F/downloads/
+
+see https://cooperrc.github.io/Julia-learning/day_06.html
+

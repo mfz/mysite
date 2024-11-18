@@ -175,6 +175,7 @@ window.Quarto = {
       </div>
                           <div class="quarto-categories">
                 <div class="quarto-category">julia</div>
+                <div class="quarto-category">physics</div>
               </div>
                   </div>
   </div>
@@ -198,6 +199,7 @@ window.Quarto = {
   <ul>
   <li><a href="#solve-using-finite-difference-method" id="toc-solve-using-finite-difference-method" class="nav-link active" data-scroll-target="#solve-using-finite-difference-method">Solve using finite difference method</a></li>
   <li><a href="#solve-using-eigenstate-evolution" id="toc-solve-using-eigenstate-evolution" class="nav-link" data-scroll-target="#solve-using-eigenstate-evolution">Solve using eigenstate evolution</a></li>
+  <li><a href="#animation" id="toc-animation" class="nav-link" data-scroll-target="#animation">Animation</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
@@ -213,7 +215,7 @@ window.Quarto = {
 <p><span class="math display">\[
 i\hbar \frac{\partial \psi(x,t)}{\partial t} = -\frac{\hbar^2}{2m} \frac{\partial^2 \psi(x,t)}{\partial x^2} + V(x) \psi(x,t)
 \]</span></p>
-<p>We also need to specify</p>
+<p>To specify a problem, we need to specify</p>
 <ul>
 <li>a domain <span class="math inline">\(0 \le x \le L\)</span>,</li>
 <li>initial conditions <span class="math inline">\(\psi(x, t=0) = \psi_0(x)\)</span> and</li>
@@ -231,29 +233,27 @@ i\hbar \frac{\partial \psi(x,t)}{\partial t} = -\frac{\hbar^2}{2m} \frac{\partia
 <p><span class="math display">\[
 V(x) = - 10^4 \exp\left(-\frac{(x - L/2)^2}{2(L/20)^2} \right)
 \]</span></p>
-<div id="e09ac868" class="cell" data-execution_count="1">
+<div id="ed64c7e1" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LaTeXStrings</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>nx <span class="op">=</span> <span class="fl">301</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>nt <span class="op">=</span> <span class="fl">100001</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>T <span class="op">=</span> <span class="fl">0.01</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>dx <span class="op">=</span> L <span class="op">/</span> (nx <span class="op">-</span> <span class="fl">1</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>dt <span class="op">=</span> T <span class="op">/</span> (nt <span class="op">-</span> <span class="fl">1</span>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">range</span>(<span class="fl">0.0</span>, L; length <span class="op">=</span> nx)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>V <span class="op">=</span> @. <span class="op">-</span><span class="fl">10000</span> <span class="op">*</span> <span class="fu">exp</span>(<span class="fu">-</span>(x <span class="op">-</span> L<span class="op">/</span><span class="fl">2</span>.)<span class="op">^</span><span class="fl">2</span> <span class="op">/</span> <span class="fl">2</span> <span class="op">/</span> (L<span class="op">/</span><span class="fl">20</span>.)<span class="op">^</span><span class="fl">2</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set_theme!</span>()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>nx <span class="op">=</span> <span class="fl">301</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>nt <span class="op">=</span> <span class="fl">100001</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>T <span class="op">=</span> <span class="fl">0.01</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>dx <span class="op">=</span> L <span class="op">/</span> (nx <span class="op">-</span> <span class="fl">1</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>dt <span class="op">=</span> T <span class="op">/</span> (nt <span class="op">-</span> <span class="fl">1</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">range</span>(<span class="fl">0.0</span>, L; length <span class="op">=</span> nx)</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(x, V; axis <span class="op">=</span> (;ylabel <span class="op">=</span> <span class="st">"V(x)"</span>, xlabel <span class="op">=</span> <span class="st">"x/L"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>┌ Warning: Found `resolution` in the theme when creating a `Scene`. The `resolution` keyword for `Scene`s and `Figure`s has been deprecated. Use `Figure(; size = ...` or `Scene(; size = ...)` instead, which better reflects that this is a unitless size and not a pixel resolution. The key could also come from `set_theme!` calls or related theming functions.
-└ @ Makie ~/.julia/packages/Makie/rEu75/src/scenes.jl:227</code></pre>
-</div>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>V <span class="op">=</span> @. <span class="op">-</span><span class="fl">10000</span> <span class="op">*</span> <span class="fu">exp</span>(<span class="fu">-</span>(x <span class="op">-</span> L<span class="op">/</span><span class="fl">2</span>.)<span class="op">^</span><span class="fl">2</span> <span class="op">/</span> <span class="fl">2</span> <span class="op">/</span> (L<span class="op">/</span><span class="fl">20</span>.)<span class="op">^</span><span class="fl">2</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(x, V; axis <span class="op">=</span> (;ylabel <span class="op">=</span> <span class="st">"V(x)"</span>, xlabel <span class="op">=</span> <span class="st">"x/L"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-2-output-2.svg" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-2-output-1.svg" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -262,18 +262,14 @@ V(x) = - 10^4 \exp\left(-\frac{(x - L/2)^2}{2(L/20)^2} \right)
 <p><span class="math display">\[
 \psi_0 = \sqrt{2} \sin(\pi x)
 \]</span></p>
-<div id="84b84940" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>Ψ₀ <span class="op">=</span> <span class="fu">sqrt</span>(<span class="fl">2</span>.) <span class="op">*</span> <span class="fu">sin</span>.(<span class="cn">π</span><span class="op">*</span>x)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(x, Ψ₀; axis <span class="op">=</span> (;ylabel <span class="op">=</span> L<span class="st">"\psi_0(x)"</span>, xlabel <span class="op">=</span> L<span class="st">"x/L"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>┌ Warning: Found `resolution` in the theme when creating a `Scene`. The `resolution` keyword for `Scene`s and `Figure`s has been deprecated. Use `Figure(; size = ...` or `Scene(; size = ...)` instead, which better reflects that this is a unitless size and not a pixel resolution. The key could also come from `set_theme!` calls or related theming functions.
-└ @ Makie ~/.julia/packages/Makie/rEu75/src/scenes.jl:227</code></pre>
-</div>
+<div id="5bbc5dfb" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Ψ₀ <span class="op">=</span> <span class="fu">sqrt</span>(<span class="fl">2</span>.) <span class="op">*</span> <span class="fu">sin</span>.(<span class="cn">π</span><span class="op">*</span>x)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(x, Ψ₀; axis <span class="op">=</span> (;ylabel <span class="op">=</span> L<span class="st">"\psi_0(x)"</span>, xlabel <span class="op">=</span> L<span class="st">"x/L"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-3-output-2.svg" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-3-output-1.svg" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -283,50 +279,46 @@ V(x) = - 10^4 \exp\left(-\frac{(x - L/2)^2}{2(L/20)^2} \right)
 \int_0^1 |\psi_0(x)|^2 \mathrm{d}x = 1
 \]</span></p>
 <p>as can be confirmed numerically</p>
-<div id="cdc015bc" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(Ψ₀<span class="op">.^</span><span class="fl">2</span> <span class="op">*</span> dx)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="947ea921" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(Ψ₀<span class="op">.^</span><span class="fl">2</span> <span class="op">*</span> dx)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>1.0000000000000002</code></pre>
 </div>
 </div>
-<div id="f15aba31" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>Ψ <span class="op">=</span> <span class="fu">zeros</span>(<span class="dt">ComplexF64</span>, nt, nx)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>Ψ[<span class="fl">1</span>,<span class="op">:</span>] <span class="op">.=</span> Ψ₀</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">evolve!</span>(psi)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>(nt<span class="op">-</span><span class="fl">1</span>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="fl">2</span><span class="op">:</span>(nx<span class="op">-</span><span class="fl">1</span>)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>            psi[t<span class="op">+</span><span class="fl">1</span>, i] <span class="op">=</span> psi[t, i] <span class="op">+</span> </span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                <span class="cn">im</span><span class="op">/</span><span class="fl">2</span> <span class="op">*</span> dt<span class="op">/</span>dx<span class="op">^</span><span class="fl">2</span> <span class="op">*</span> (psi[t, i<span class="op">+</span><span class="fl">1</span>] <span class="op">-</span> <span class="fl">2</span><span class="op">*</span>psi[t, i] <span class="op">+</span> psi[t, i<span class="op">-</span><span class="fl">1</span>]) <span class="op">-</span> </span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                <span class="cn">im</span><span class="op">*</span>dt<span class="op">*</span>V[i]<span class="op">*</span>psi[t, i]</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        normal <span class="op">=</span> <span class="fu">sum</span>(<span class="fu">abs</span>.(psi[t<span class="op">+</span><span class="fl">1</span>,<span class="op">:</span>])<span class="op">.^</span><span class="fl">2</span>)<span class="op">*</span>dx</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>(nx<span class="op">-</span><span class="fl">1</span>)</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>            psi[t<span class="op">+</span><span class="fl">1</span>,i] <span class="op">=</span> psi[t<span class="op">+</span><span class="fl">1</span>,i]<span class="op">/</span>normal</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="fu">evolve!</span>(Ψ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="7a7644fa" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Ψ <span class="op">=</span> <span class="fu">zeros</span>(<span class="dt">ComplexF64</span>, nt, nx)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>Ψ[<span class="fl">1</span>,<span class="op">:</span>] <span class="op">.=</span> Ψ₀</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">evolve!</span>(psi)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>(nt<span class="op">-</span><span class="fl">1</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="fl">2</span><span class="op">:</span>(nx<span class="op">-</span><span class="fl">1</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>            psi[t<span class="op">+</span><span class="fl">1</span>, i] <span class="op">=</span> psi[t, i] <span class="op">+</span> </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>                <span class="cn">im</span><span class="op">/</span><span class="fl">2</span> <span class="op">*</span> dt<span class="op">/</span>dx<span class="op">^</span><span class="fl">2</span> <span class="op">*</span> (psi[t, i<span class="op">+</span><span class="fl">1</span>] <span class="op">-</span> <span class="fl">2</span><span class="op">*</span>psi[t, i] <span class="op">+</span> psi[t, i<span class="op">-</span><span class="fl">1</span>]) <span class="op">-</span> </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                <span class="cn">im</span><span class="op">*</span>dt<span class="op">*</span>V[i]<span class="op">*</span>psi[t, i]</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        normal <span class="op">=</span> <span class="fu">sum</span>(<span class="fu">abs</span>.(psi[t<span class="op">+</span><span class="fl">1</span>,<span class="op">:</span>])<span class="op">.^</span><span class="fl">2</span>)<span class="op">*</span>dx</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>(nx<span class="op">-</span><span class="fl">1</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>            psi[t<span class="op">+</span><span class="fl">1</span>,i] <span class="op">=</span> psi[t<span class="op">+</span><span class="fl">1</span>,i]<span class="op">/</span>normal</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">end</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="fu">evolve!</span>(Ψ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="e7a9fdc7" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>f,a,p <span class="op">=</span> <span class="fu">lines</span>(x, <span class="fu">abs2</span>.(Ψ[<span class="fl">1</span>,<span class="op">:</span>]); </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>            label <span class="op">=</span> L<span class="st">"t = 0"</span>, </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>            axis <span class="op">=</span> (;xlabel <span class="op">=</span> L<span class="st">"x"</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                     ylabel <span class="op">=</span> L<span class="st">"\Psi(5000, x)"</span>))</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">lines!</span>(a, x, <span class="fu">abs2</span>.(Ψ[<span class="fl">5000</span>,<span class="op">:</span>]); label <span class="op">=</span> L<span class="st">"t = 5000"</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="fu">axislegend</span>(a)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>f</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>┌ Warning: Found `resolution` in the theme when creating a `Scene`. The `resolution` keyword for `Scene`s and `Figure`s has been deprecated. Use `Figure(; size = ...` or `Scene(; size = ...)` instead, which better reflects that this is a unitless size and not a pixel resolution. The key could also come from `set_theme!` calls or related theming functions.
-└ @ Makie ~/.julia/packages/Makie/rEu75/src/scenes.jl:227</code></pre>
-</div>
+<div id="9cf8db11" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>f,a,p <span class="op">=</span> <span class="fu">lines</span>(x, <span class="fu">abs2</span>.(Ψ[<span class="fl">1</span>,<span class="op">:</span>]); </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>            label <span class="op">=</span> L<span class="st">"t = 0"</span>, </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>            axis <span class="op">=</span> (;xlabel <span class="op">=</span> L<span class="st">"x"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                     ylabel <span class="op">=</span> L<span class="st">"\Psi(5000, x)"</span>))</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">lines!</span>(a, x, <span class="fu">abs2</span>.(Ψ[<span class="fl">5000</span>,<span class="op">:</span>]); label <span class="op">=</span> L<span class="st">"t = 5000"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">axislegend</span>(a)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>f</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-6-output-2.svg" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-6-output-1.svg" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -384,10 +376,58 @@ b &amp; a_2 &amp; b &amp; 0 &amp; \cdots &amp; 0 &amp; 0 \\
 \end{bmatrix}
 \]</span></p>
 <p>where: - <span class="math inline">\(a_i = \frac{\hbar^2}{m (\Delta x)^2} + V(x_i)\)</span> (diagonal elements), - <span class="math inline">\(b = -\frac{\hbar^2}{2m (\Delta x)^2}\)</span> (off-diagonal elements).</p>
-<div id="5452cb47" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#using LinearAlgebra</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#eigen(SymTridiagonal(d, e))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="c1a7e818" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="fl">1</span><span class="op">/</span>dx<span class="op">^</span><span class="fl">2</span> <span class="op">.+</span> V[<span class="fl">2</span><span class="op">:</span>(<span class="kw">end</span><span class="op">-</span><span class="fl">1</span>)]</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">/</span>(<span class="fl">2</span><span class="op">*</span>dx<span class="op">^</span><span class="fl">2</span>) <span class="op">.*</span> <span class="fu">ones</span>(<span class="fu">length</span>(a)<span class="op">-</span><span class="fl">1</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> <span class="fu">eigen</span>(<span class="fu">SymTridiagonal</span>(a, b));</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The k-th eigenvalue can be accessed using F.values[k], the k-th eigenvector as F.vectors[:,k].</p>
+<div id="9802b3c1" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>E_j <span class="op">=</span> F.values[<span class="fl">1</span><span class="op">:</span><span class="fl">70</span>]</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>ψⱼ <span class="op">=</span> <span class="fu">vcat</span>(<span class="fu">zeros</span>(<span class="fl">70</span>)<span class="ch">', F.vectors[:,1:70], zeros(70)'</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>cⱼ <span class="op">=</span> ψⱼ<span class="ch">' * Ψ₀</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(x, <span class="fu">abs2</span>.(ψⱼ <span class="op">*</span> (cⱼ <span class="op">.*</span> <span class="fu">exp</span>.(<span class="op">-</span><span class="cn">im</span><span class="op">*</span>E_j<span class="op">*</span><span class="fl">5000</span><span class="op">*</span>dt))  )) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-8-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="animation" class="level2">
+<h2 class="anchored" data-anchor-id="animation">Animation</h2>
+<div id="1ed8379d" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fu">Observable</span>(<span class="fl">0</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="pp">@lift</span> <span class="fu">abs2</span>.(ψⱼ <span class="op">*</span> (cⱼ <span class="op">.*</span> <span class="fu">exp</span>.(<span class="op">-</span><span class="cn">im</span><span class="op">*</span>E_j<span class="op">*$</span>t<span class="op">*</span>dt)))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="fu">Figure</span>()</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> <span class="fu">Axis</span>(f[<span class="fl">1</span>,<span class="fl">1</span>], xlabel <span class="op">=</span> L<span class="st">"x/L"</span>, ylabel <span class="op">=</span> L<span class="st">"|\psi(x)|^2"</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>           title <span class="op">=</span> <span class="pp">@lift</span> <span class="st">"t = </span><span class="sc">$</span>(<span class="op">$</span>t)<span class="st"> dt"</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">lines!</span>(ax, x, y;</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>          color <span class="op">=</span> <span class="op">:</span>blue)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">xlims!</span>(ax, <span class="fl">0.0</span>, <span class="fl">1.0</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ylims!</span>(ax, <span class="fl">0</span>, <span class="fl">20</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="fu">record</span>(f, <span class="st">"schroedinger_animation.gif"</span>, <span class="fl">0</span><span class="op">:</span><span class="fl">100</span><span class="op">:</span><span class="fl">30000</span>, framerate <span class="op">=</span> <span class="fl">30</span>) <span class="cf">do</span> i </span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  t[] <span class="op">=</span> i  </span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>"schroedinger_animation.gif"</code></pre>
+</div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="schroedinger_animation.gif" class="img-fluid figure-img"></p>
+<figcaption>Schroedinger animation</figcaption>
+</figure>
 </div>
 </section>
 <section id="references" class="level2">

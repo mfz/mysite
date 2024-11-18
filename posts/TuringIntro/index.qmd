@@ -6,7 +6,7 @@ format:
     toc: true
     number-sections: true
 jupyter: julia-1.10
-draft: true
+draft: false
 ---
 
 Turing.jl is a probabilistic proramming language that let's us define a generative model and does inference.
@@ -23,9 +23,13 @@ coin_flips = rand(Bernoulli(0.7), 100);
 
 In order to do inference, we need to specify a model.
 
- $$ p \sim Beta(1,1) $$
+ $$ 
+ p \sim Beta(1,1) 
+ $$
 
- $$ coin flip \sim Bernoulli(p) $$
+ $$ 
+ coin flip \sim Bernoulli(p) 
+ $$
 
 
 ```{julia}
@@ -61,7 +65,7 @@ posterior = sample(coin(coin_flips), NUTS(), 1000)
 
 
 ```{julia}
-summarystats(prior)
+summarystats(posterior)
 ```
 
 ```{julia}
@@ -97,7 +101,7 @@ The results of sampling runs are `MCMCChains.Chains` instances.
 
 A `Chains` instance has the following fields:
 
-- value: `AxisArray` object `:iter` x `:var` x `:chain`
+- value: `AxisArray` object of size `:iter` x `:var` x `:chain`
 - logevidence
 - name_map (to define sections, NamedTuple section -> names, default section is `:parameters`)
 - info
@@ -115,6 +119,12 @@ To get a `Chains` instance with only parameter a, do `chn[[:a]]`. Weird!
 
 
 An `AxisArray` has fields `:axes` and `:data`. It has advanced indexing.
+
+For example, our `prior_check` from above has axes `[:iter, :var, :chain]`.
+
+Can use 
+`prior_check.value[var]
+
 I.e. to get only a slice of a dimension `:dim`, one can use `A[dim = idx]`,
 so in the case of a MCMC sample, we might use `chn.value[var = :a]`, or `chn.value[chain = 2]`
 
