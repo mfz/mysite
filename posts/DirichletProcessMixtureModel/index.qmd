@@ -7,6 +7,7 @@ format:
     number-sections: true
 jupyter: julia-1.10
 draft: true
+freeze: auto
 ---
 
 ### Two-component Gaussian Mixture Model (GMM)
@@ -204,10 +205,13 @@ hist(y; bins = 50)
 K = 5  # Maximum number of components
 model = dp_gmm(y, K)
 chain = sample(model, NUTS(), 1000)
-
 ```
 
 
 ### References
 
 - https://luiarthur.github.io/TuringBnpBenchmarks/dpsbgmm 
+
+The post here really shows how to apply this to real data
+using PyMC
+- https://austinrochford.com/posts/2016-02-25-density-estimation-dpm.html

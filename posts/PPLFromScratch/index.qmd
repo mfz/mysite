@@ -319,7 +319,9 @@ $$
 $$
 
 
-Instead of drawing $y$ from $[0,1]$ we draw $x$ from $(-\infty, +\infty)$ using some proposal distribution. In the equation for the acceptance probability, we then replace each occurrence of $P_y(y)$ with $P_x(x) = P_y(y = \sigma(x)) \sigma'(x)$.
+Instead of drawing $y$ from $[0,1]$ we draw $x$ from $(-\infty, +\infty)$ using some proposal distribution. 
+In the equation for the acceptance probability, we then replace each occurrence of $P_y(y)$ with 
+$P_x(x) = P_y(y = \sigma(x)) \sigma'(x)$.
 
 ```{julia}
 # solve Beta-Binomial problem using constrained MCMC
@@ -346,8 +348,9 @@ function metropolis_hastings(logprior, loglik, logjac, initial, randproposal, lo
     
     for i in 1:n
         proposed = randproposal(current)
-        current_ = logistic(current)
-        proposed_ = logistic(proposed)
+        current_ = logistic(current)    # current_ in in [0,1]
+        proposed_ = logistic(proposed)  # proposed_ is in [0,1]
+        # log p(current|data) = log p(current_ | data) + log partial(current_, current) 
         lp_current = logprior(current_) + loglik(current_) + logjac(current) + logproposal(proposed, current) 
         lp_proposed = logprior(proposed_) + loglik(proposed_) + logjac(proposed) + logproposal(current, proposed)
         Δ = lp_proposed - lp_current
@@ -385,6 +388,8 @@ f
 
 
 see also: https://theoryandpractice.org/stats-ds-book/distributions/change-of-variables.html
+
+see around Eqn 16.8 in Ben Lambert's A student's guide to Bayesian Statistics for a nice example
 
 ## References
 

@@ -251,7 +251,7 @@ x_i &amp;\sim N(\mu_{z_i}, \sigma)
 </ul>
 <p>The <span class="math inline">\(\pi_k\)</span> now correspond to the mixture weights. The parameters of the mixture components, <span class="math inline">\(\mu_k\)</span> and <span class="math inline">\(\sigma_k\)</span> are drawn from the base distribution <span class="math inline">\(G_o\)</span>.</p>
 <p>To simulate the number of components <span class="math inline">\(K\)</span>, one stops the iteration when the remaining stick is shorter than some small threshold, and renormalizes the obtained mixture weights to sum to one.</p>
-<div id="62fa356d" class="cell" data-execution_count="1">
+<div id="12a1a238" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Distributions</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -267,7 +267,7 @@ x_i &amp;\sim N(\mu_{z_i}, \sigma)
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span>; </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let’s look at the number of components we get as a function of <span class="math inline">\(\alpha\)</span>.</p>
-<div id="ca4622f2" class="cell" data-execution_count="2">
+<div id="207f4383" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">simulate_k</span>(α)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    niter <span class="op">=</span> <span class="fl">1000</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    k <span class="op">=</span> <span class="fu">zeros</span>(<span class="dt">Int64</span>, niter)</span>
@@ -289,7 +289,7 @@ x_i &amp;\sim N(\mu_{z_i}, \sigma)
 └ @ Makie ~/.julia/packages/Makie/pFPBw/src/scenes.jl:238</code></pre>
 </div>
 </div>
-<div id="ccd7314c" class="cell" data-execution_count="3">
+<div id="ca0f6255" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Turing</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Distributions</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
@@ -355,7 +355,7 @@ x_i &amp;\sim N(\mu_{z_i}, \sigma)
 </div>
 </div>
 <p>Note, the second version has severe convergence problems. The reason is probably that the computed logprobability fluctuates a lot, depending on which z was chosen. The first version integrates over that assignment.</p>
-<div id="c73edc6f" class="cell" data-execution_count="4">
+<div id="52bb99ee" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate synthetic data</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Random</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">Random</span>.<span class="fu">seed!</span>(<span class="fl">123</span>)</span>
@@ -377,7 +377,7 @@ x_i &amp;\sim N(\mu_{z_i}, \sigma)
 </div>
 </div>
 </div>
-<div id="a96f56bf" class="cell" data-execution_count="5">
+<div id="14af1511" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample from the posterior</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> <span class="fl">5</span>  <span class="co"># Maximum number of components</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> <span class="fu">dp_gmm</span>(y, K)</span>
@@ -385,7 +385,7 @@ x_i &amp;\sim N(\mu_{z_i}, \sigma)
 <div class="cell-output cell-output-stderr">
 <pre><code>┌ Info: Found initial step size
 └   ϵ = 0.046875
-Sampling:   1%|▋                                        |  ETA: 0:00:33Sampling:   2%|█                                        |  ETA: 0:00:42Sampling:   3%|█▏                                       |  ETA: 0:00:45Sampling:   3%|█▎                                       |  ETA: 0:00:44Sampling:   4%|█▌                                       |  ETA: 0:00:41Sampling:   4%|█▊                                       |  ETA: 0:00:41Sampling:   5%|█▉                                       |  ETA: 0:00:43Sampling:   5%|██▏                                      |  ETA: 0:00:43Sampling:   6%|██▎                                      |  ETA: 0:00:43Sampling:   6%|██▌                                      |  ETA: 0:00:44Sampling:   6%|██▋                                      |  ETA: 0:00:44Sampling:   8%|███▎                                     |  ETA: 0:00:37Sampling:  12%|█████                                    |  ETA: 0:00:24Sampling:  17%|███████                                  |  ETA: 0:00:16Sampling:  22%|█████████                                |  ETA: 0:00:12Sampling:  26%|██████████▌                              |  ETA: 0:00:11Sampling:  32%|█████████████                            |  ETA: 0:00:08Sampling:  37%|███████████████▎                         |  ETA: 0:00:07Sampling:  44%|██████████████████                       |  ETA: 0:00:05Sampling:  50%|████████████████████▋                    |  ETA: 0:00:04Sampling:  56%|███████████████████████▏                 |  ETA: 0:00:03Sampling:  62%|█████████████████████████▋               |  ETA: 0:00:03Sampling:  70%|████████████████████████████▌            |  ETA: 0:00:02Sampling:  76%|███████████████████████████████▏         |  ETA: 0:00:01Sampling:  83%|█████████████████████████████████▉       |  ETA: 0:00:01Sampling:  89%|████████████████████████████████████▌    |  ETA: 0:00:01Sampling:  96%|███████████████████████████████████████▎ |  ETA: 0:00:00Sampling: 100%|█████████████████████████████████████████| Time: 0:00:05</code></pre>
+Sampling:   1%|▋                                        |  ETA: 0:00:32Sampling:   2%|█                                        |  ETA: 0:00:42Sampling:   3%|█▏                                       |  ETA: 0:00:44Sampling:   3%|█▎                                       |  ETA: 0:00:43Sampling:   4%|█▌                                       |  ETA: 0:00:41Sampling:   4%|█▊                                       |  ETA: 0:00:40Sampling:   5%|█▉                                       |  ETA: 0:00:42Sampling:   5%|██▏                                      |  ETA: 0:00:42Sampling:   6%|██▎                                      |  ETA: 0:00:43Sampling:   6%|██▌                                      |  ETA: 0:00:43Sampling:   6%|██▋                                      |  ETA: 0:00:43Sampling:   8%|███▎                                     |  ETA: 0:00:37Sampling:  12%|█████                                    |  ETA: 0:00:23Sampling:  17%|██████▉                                  |  ETA: 0:00:17Sampling:  21%|████████▋                                |  ETA: 0:00:13Sampling:  25%|██████████▍                              |  ETA: 0:00:11Sampling:  31%|████████████▊                            |  ETA: 0:00:09Sampling:  37%|███████████████▏                         |  ETA: 0:00:07Sampling:  43%|█████████████████▋                       |  ETA: 0:00:05Sampling:  49%|████████████████████▎                    |  ETA: 0:00:04Sampling:  56%|██████████████████████▊                  |  ETA: 0:00:03Sampling:  62%|█████████████████████████▎               |  ETA: 0:00:03Sampling:  69%|████████████████████████████▏            |  ETA: 0:00:02Sampling:  76%|███████████████████████████████          |  ETA: 0:00:01Sampling:  82%|█████████████████████████████████▋       |  ETA: 0:00:01Sampling:  88%|████████████████████████████████████▏    |  ETA: 0:00:01Sampling:  95%|██████████████████████████████████████▉  |  ETA: 0:00:00Sampling: 100%|█████████████████████████████████████████| Time: 0:00:05</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div class="ansi-escaped-output">
@@ -393,8 +393,8 @@ Sampling:   1%|▋                                        |  ETA: 0:00:33Samplin
 Iterations        = 501:1:1500
 Number of chains  = 1
 Samples per chain = 1000
-Wall duration     = 10.39 seconds
-Compute duration  = 10.39 seconds
+Wall duration     = 10.41 seconds
+Compute duration  = 10.41 seconds
 parameters        = μ[1], μ[2], μ[3], μ[4], μ[5], σ[1], σ[2], σ[3], σ[4], σ[5], α, v[1], v[2], v[3], v[4]
 internals         = lp, n_steps, is_accept, acceptance_rate, log_density, hamiltonian_energy, hamiltonian_energy_error, max_hamiltonian_energy_error, tree_depth, numerical_error, step_size, nom_step_size
 Summary Statistics
@@ -444,6 +444,7 @@ Quantiles
 <ul>
 <li>https://luiarthur.github.io/TuringBnpBenchmarks/dpsbgmm</li>
 </ul>
+<p>The post here really shows how to apply this to real data using PyMC - https://austinrochford.com/posts/2016-02-25-density-estimation-dpm.html</p>
 
 
 </section>

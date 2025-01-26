@@ -6,6 +6,8 @@ categories: julia, Bayes
 draft: true
 ---
 
+- Derivation and example in python https://zhiyzuo.github.io/VI/
+
 Suppose we have a Bayesian model with a set of parameters and latent variables, 
 denoted as $\mathbf{Z}$. Our goal is to infer the conditional distribution 
 $p(\mathrm{Z}|\mathrm{X})$, where $\mathrm{X}$ denotes the data.
@@ -92,3 +94,4 @@ would diverge. For a multi-modal $p(\mathbf{Z}|\mathbf{X})$, VI will, therefore,
 
 - Bishop C.(2006), Pattern Recognition and Machine Learning, Chapter 10
 - Murphy K.(2012), Machine learning - a probabilistic perspective, Chapter 21
+

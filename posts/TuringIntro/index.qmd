@@ -24,11 +24,10 @@ coin_flips = rand(Bernoulli(0.7), 100);
 In order to do inference, we need to specify a model.
 
  $$ 
- p \sim Beta(1,1) 
- $$
-
- $$ 
- coin flip \sim Bernoulli(p) 
+ \begin{align*}
+ p & \sim Beta(1,1) \\
+ coinflip & \sim Bernoulli(p) 
+ \end{align*} 
  $$
 
 
@@ -48,12 +47,15 @@ end
 prior = sample(coin(coin_flips), Prior(), 1000)
 ```
 
+An overview of the chain can be obtained using `summarystats` or `quantile`.
+Or `describe`, which returns both.
+
 ```{julia}
 summarystats(prior)
 ```
 
 ```{julia}
-DataFrame(prior) 
+DataFrame(prior)[1:10, :]
 ```
 
 
@@ -99,52 +101,191 @@ posterior_check = predict(coin(observations), posterior)
 
 The results of sampling runs are `MCMCChains.Chains` instances.
 
-A `Chains` instance has the following fields:
-
-- value: `AxisArray` object of size `:iter` x `:var` x `:chain`
-- logevidence
-- name_map (to define sections, NamedTuple section -> names, default section is `:parameters`)
-- info
-
 ```{julia}
 value = rand(500, 2, 3)
 chn = Chains(value, [:a, :b])
 chn2 = Chains(value, ["A[1]", "A[2]"])
 ```
 
+Names of variables stored in a chain can be retrieved using
 
-One can restrict the output (an `AxisArray`) to some parameters by using `chn[:a]`, for example.
-To get a `Chains` instance with only parameter a, do `chn[[:a]]`. Weird!
+```{julia}
+names(prior)
+```
+
+Often, names are organized in to groups, i.e. `data[1]`, `data[2]`, ...
+To retrieve the names within a group one can use `namesingroup(chn, :data)`.
+`group(chn, :data)`
+
+Names can be organized into sections. Turings `sample` returns a `Chains` instance with sections `:parameters` and `:internals`.
+
+```{julia}
+sections(prior)
+```
+
+The mapping of names into sections is stored in `prior.name_map` as a `NamedTuple`.
+
+To retrieve the names for a specific section only, use e.g.
+
+```{julia}
+names(prior, :parameters)
+```
+
+Many functions can be restricted to specific sections. E.g. 
+`summarystats(prior, :parameters)`, `Array(prior, :parameters)`.
+
+A `Chains` instance has the following fields:
+- value: `AxisArray` object of size `:iter` x `:var` x `:chain`
+- logevidence
+- name_map (to define sections, NamedTuple section -> names, default section is `:parameters`)
+- info
+
+Chains can be indexed, 
+- `prior[:p]` returns an `AxisArray` for `:p`
+- `prior[[:p, :lp]]` returns a `Chain` restricted to `[:p, :lp]`
+- `prior[1:10, [:p], 1]` restricts chain to iterations `1:10`, `:p`, and the first chain 
 
 
-
-An `AxisArray` has fields `:axes` and `:data`. It has advanced indexing.
+An `AxisArray` has fields `:axes` and `:data`. It is like an `Array` but
+is aware of dimension names.
 
 For example, our `prior_check` from above has axes `[:iter, :var, :chain]`.
 
 Can use 
-`prior_check.value[var]
+`prior_check.value[var]`
 
 I.e. to get only a slice of a dimension `:dim`, one can use `A[dim = idx]`,
-so in the case of a MCMC sample, we might use `chn.value[var = :a]`, or `chn.value[chain = 2]`
-
-`summarystats(chn; sections = :parameters)`
-
-`quantile(chn; sections = :parameters)`
-
-or `describe(chn; sections = :parameters)` to get both at once 
-
-
-Turings `sample` returns a `Chains` instance with sections `:parameters` and `:internals`.
-
-```{julia}
-posterior.name_map
-```
+so in the case of a MCMC sample, we might use `prior.value[var = :p]`, or `prior.value[chain = 1]`
 
 To convert a chain to a DataFrame containing the `:parameters` section only, one can do
 
 ```{julia}
-DataFrame(posterior[posterior.name_map.parameters])
-
-# or DataFrame(MCMCchains.get_sections(posterior, :parameters))
+DataFrame(posterior[names(posterior, :parameters)]);
 ```
+
+To extract the parameters as an `Array`one can use
+
+```{julia}
+Array(prior_check, :parameters);
+```
+
+
+## Linear regression
+
+Linear regression models a continuous (dependent) variable as a linear combination of independent predictors.
+
+$$
+y = X \beta + \alpha + \epsilon
+$$
+
+
+The corresponding Bayesian formulation can be written as
+
+$$
+\begin{align*}
+  \mathbf{y} & \sim N(\alpha + \mathbf{X} \mathbf{\beta}, \sigma) \\
+  \alpha & \sim N(\mu_{\alpha}, \sigma_{\alpha}) \\
+  \beta & \sim N(\mu_{\beta}, \sigma_{\beta}) \\
+  \sigma & \sim Exp(\lambda_{\sigma})
+\end{align*}
+$$
+
+The purpose of inference is to obtain $P(\alpha, \beta, \sigma | \mathbf{y}, \mathbf{X})$.
+
+In `Turing.jl`, we first need to specify the generative model
+
+```{julia}
+using LinearAlgebra: I
+using StatsBase
+using Turing
+
+@model function linreg(X, y; n = size(X, 2))
+
+  α ~ Normal(mean(y), 2.5 * std(y))
+  β ~ filldist(Normal(0, 2), n)
+  σ ~ Exponential(1)
+
+  return y ~ MvNormal(X*β .+ α, I * σ^2)
+end
+```
+
+```{julia}
+using CSV
+using DataFrames
+
+kidiq = CSV.read("kidiq.csv", DataFrame)
+describe(kidiq)
+```
+
+```{julia}
+X = Matrix(select(kidiq, Not(:kid_score)))
+y = kidiq[:, :kid_score]
+model = linreg(X, y)
+
+names(select(kidiq, Not(:kid_score)))
+```
+
+```{julia}
+chain = sample(model, NUTS(), 1000)
+summarystats(chain)
+```
+
+
+
+## Logistic regression
+
+```{julia}
+using CSV
+using DataFrames
+
+wells = CSV.read("wells.csv", DataFrame)
+describe(wells)
+```
+
+
+```{julia}
+using Turing
+
+@model function logreg(X, y; predictors=size(X, 2))
+    #priors
+    α ~ Normal(0, 2.5)
+    β ~ filldist(TDist(3), predictors)
+
+    #likelihood
+    return y .~  BernoulliLogit.(α .+ X * β)
+end;
+
+function logistic(x)
+    return 1 / (1 + exp(-x))
+end
+
+@model function logreg2(X, y; predictors=size(X, 2))
+    #priors
+    α ~ Normal(0, 2.5)
+    β ~ filldist(TDist(3), predictors)
+
+    #likelihood
+    p = logistic.(α .+ X * β)
+    return y .~  Bernoulli.(p)
+end;
+
+
+
+```
+
+```{julia}
+X = Matrix(select(wells, Not(:switch)))
+y = wells[:, :switch]
+model = logreg2(X, y);
+```
+
+```{julia}
+chain = sample(model, NUTS(), 1000)
+summarystats(chain)
+```
+
+
+## References
+
+- Bayesian Statistics using Julia and Turing, https://storopoli.io/Bayesian-Julia/
+- Turing.jl tutorials, https://turing.ml/v0.22/tutorials/ 
