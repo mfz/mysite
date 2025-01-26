@@ -1,0 +1,158 @@
+---
+title: "Simulated Annealing"
+description: "Solving the Travleing Salesman Problem (TSP) using Simulated Annealing (SA) in julia"
+jupyter: julia-1.10
+categories: 
+    - julia
+    - optimization
+    - algorithms
+draft: false
+---
+
+## The Traveling Salesperson Problem (TSP)
+
+The Traveling Salesperson Problem (TSP) is a classic optimization problem: Given a list of cities and the distances between each pair of cities, what is the shortest possible route that visits each city exactly once and returns to the starting city?
+
+This problem becomes incredibly challenging as the number of cities increases. It's a prime example of an NP-hard problem, meaning that finding the absolute *best* solution becomes computationally infeasible with just a moderate number of cities. As such, we often resort to heuristic methods to find *good enough* solutions in a reasonable time.
+
+
+## Simulated Annealing (SA)
+
+Simulated Annealing is a probabilistic metaheuristic that draws inspiration from the process of annealing in metallurgy. When metals are heated and then slowly cooled, they reach a state of minimum energy, forming a very strong and ordered crystalline structure. If they are cooled too quickly, they can end up in a less ordered, higher energy state. SA mimics this process to find good solutions in optimization problems.
+
+1.  **Start with a random configuration**: In our case, a random ordering of cities.
+2.  **Define an "energy" function**: In our case, this will be the total distance of the route. We want to *minimize* this energy.
+3.  **Start with a high temperature**:  The "temperature" is a parameter that controls the probability of accepting worse solutions. At high temperatures, the algorithm is more likely to accept moves that increase the energy.
+4.  **Iterate and perturb:**
+    *   Randomly "perturb" the current solution. For TSP, a perturbation could be swapping the positions of two cities.
+    *   Calculate the change in "energy" (total route distance) that would result from accepting this move.
+    *   If the proposed change *decreases* the energy (shorter route), *accept* the move.
+    *   If the proposed change *increases* the energy (longer route), *accept* it with a probability that depends on the temperature:
+
+        *   The probability is calculated using the Boltzmann probability equation:  `exp(-delta_energy / temperature)`. This means the higher the `delta_energy`, the lower the acceptance probability. Also, higher temperatures means more probability of accepting bad steps.
+5.  **Cool the system:**  Gradually decrease the temperature. As the temperature decreases, the probability of accepting moves that increase the energy decreases. The algorithm becomes more "greedy" towards better solutions and will likely converge to a good (but not necessarily optimal) solution.
+6.  **Repeat steps 4-5** until a stopping criteria is met (e.g., fixed number of steps, temperature reaches a minimum).
+
+By accepting bad solutions with a probability that decreases with temperature, the algorithm can avoid getting stuck in local minima (a suboptimal solution) and explore different parts of the solution space.
+
+
+## Implementing SA in Julia
+
+The implementation fo simulated annealing (SA) requires:
+
+*   **An Objective Function:** This function takes the problem data (e.g., the cities in TSP) and a set of parameters (e.g., a route in TSP), and returns a numerical value representing the "energy" or "cost" of the solution. The goal of the optimization is to *minimize* this value.
+*   **A Proposal Function:** This function takes the problem data and the current set of parameters and proposes a new set of parameters. In TSP, this could be a function that swaps two cities in the route. This is the way we "perturb" the current solution.
+
+With these two components, the core SA algorithm can remain the same regardless of the specific optimization problem.
+
+```{julia}
+function simulated_annealing(data, initial_params, objective_function, proposal_function;
+                              initial_temperature=1000.0,
+                              cooling_rate=0.99,
+                              iterations = 10000)
+    current_params = initial_params
+    current_energy = objective_function(data, current_params)
+    temperature = initial_temperature
+    best_params = copy(current_params)
+    best_energy = current_energy
+
+    energies = [current_energy] # keep track of energies during SA
+
+    for i in 1:iterations
+        proposed_params = proposal_function(data, current_params)
+        proposed_energy = objective_function(data, proposed_params)
+
+        delta_energy = proposed_energy - current_energy
+        if delta_energy < 0
+           current_params = proposed_params
+           current_energy = proposed_energy
+            if proposed_energy < best_energy
+                best_energy = proposed_energy
+                best_params = copy(proposed_params)
+            end
+        else
+           acceptance_probability = exp(-delta_energy / temperature)
+           if rand() < acceptance_probability
+               current_params = proposed_params
+               current_energy = proposed_energy
+           end
+       end
+       temperature *= cooling_rate
+       push!(energies, current_energy)
+    end
+    return best_params, best_energy, energies
+end
+```
+
+
+## Solving the Traveling Salesperson Problem using Simulated Annealing
+
+In order to solve TSP using SA, we need to implement the problem-specific objective function (`calculate_distance`) and the proposal function (`perturb_route`).
+
+
+```{julia}
+using Random
+using StatsBase: sample
+using CairoMakie
+
+function calculate_distance(cities, route)
+    total_distance = 0.0
+    for i in 1:(length(route)-1)
+        city1 = route[i]
+        city2 = route[i+1]
+        total_distance += sqrt((cities[city1][1] - cities[city2][1])^2 + (cities[city1][2] - cities[city2][2])^2)
+    end
+   # Complete the route back to the starting point
+   total_distance += sqrt((cities[route[end]][1] - cities[route[1]][1])^2 + (cities[route[end]][2] - cities[route[1]][2])^2)
+
+    return total_distance
+end
+
+function perturb_route(cities, route)
+    n = length(route)
+    i, j = sample(1:n, 2, replace=false) # select 2 random cities
+    route[i], route[j] = route[j], route[i] # swap them
+    return route
+end
+
+```
+
+
+```{julia}
+
+# Set up cities 
+cities = Dict(
+    1 => [1.0, 1.0],
+    2 => [2.0, 2.0],
+    3 => [4.0, 1.0],
+    4 => [4.0, 3.0],
+    5 => [3.0, 5.0],
+    6 => [1.0, 4.0],
+    7 => [5.0, 5.0]
+);
+
+
+# Initialize a random route
+initial_route = collect(1:length(cities))
+shuffle!(initial_route)
+
+
+# Run the generalized SA algorithm for TSP
+best_route, best_distance, distances = simulated_annealing(
+    cities,                     # problem data
+    initial_route,              # initial parameters (route)
+    calculate_distance,       # objective function
+    perturb_route,                # proposal function
+    iterations = 10000,           # additional parameters
+    cooling_rate = 0.99
+)
+
+
+
+
+println("Best Route: ", best_route)
+println("Best Distance: ", best_distance)
+
+plot(distances, axis = (;title="Distance during Simulated Annealing", xlabel="Iteration", ylabel="Total Distance"))
+
+```
